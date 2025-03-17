@@ -9,10 +9,10 @@
 │ └── favicon.ico # 网站图标
 ├── src/
 | ├── store/                 # 全局状态管理
-| │   ├── globalStore.ts     # 全局状态
-| │   ├── authStore.ts       # 认证状态
-| │   ├── themeStore.ts      # 主题状态
-| │   ├── userStore.ts       # 用户相关状态
+| │ ├── globalStore.ts     # 全局状态
+| │ ├── authStore.ts       # 认证状态
+| │ ├── themeStore.ts      # 主题状态
+| │ ├── userStore.ts       # 用户相关状态
 │ ├── app/ # Next.js App Router 入口
 │ │ ├── layout.tsx # 全局布局
 │ │ ├── page.tsx # 主页
@@ -91,10 +91,10 @@
 ```
 /my-next-app
 ├── store/                 # 全局状态管理
-│   ├── globalStore.ts     # 全局状态
-│   ├── authStore.ts       # 认证状态
-│   ├── themeStore.ts      # 主题状态
-│   ├── userStore.ts       # 用户相关状态
+│ ├── globalStore.ts     # 全局状态
+│ ├── authStore.ts       # 认证状态
+│ ├── themeStore.ts      # 主题状态
+│ ├── userStore.ts       # 用户相关状态
 ├── public/ # 静态资源
 │ ├── images/ # 图片资源
 │ ├── icons/ # 图标

@@ -21,15 +21,7 @@ const eslintConfig = [
   },
   // 自定义 ESLint 规则
   {
-    rules: {
-      "no-unused-vars": [
-        "warn", // 等价于 1，警告但不报错
-        {
-          args: "after-used",
-          argsIgnorePattern: "^_",
-        },
-      ],
-    },
+    rules: {},
   },
 ];
 
