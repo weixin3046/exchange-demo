@@ -27,20 +27,20 @@ export default function TradeLayout() {
         draggableHandle=".drag-handle"
         onLayoutChange={handleChangeLayout}
       >
-        <div key="a" className="border border-black rounded p-5 shadow-2xl relative">
-          <div className="drag-handle cursor-move z-10 absolute top-1.5 right-1.5">🔧</div>
+        <div key="a" className="relative rounded border border-black p-5 shadow-2xl">
+          <div className="drag-handle absolute top-1.5 right-1.5 z-10 cursor-move">🔧</div>
           <h3>Box A</h3>
         </div>
-        <div key="b" className="border border-black rounded p-5 shadow-2xl relative">
-          <div className="drag-handle cursor-move z-10 absolute top-1.5 right-1.5">🔧</div>
+        <div key="b" className="relative rounded border border-black p-5 shadow-2xl">
+          <div className="drag-handle absolute top-1.5 right-1.5 z-10 cursor-move">🔧</div>
           <h3>Box B</h3>
         </div>
-        <div key="c" className="border border-black rounded p-5 shadow-2xl relative">
-          <div className="drag-handle cursor-move z-10 absolute top-1.5 right-1.5">🔧</div>
-          <h3>Box C</h3>
+        <div key="c" className="relative rounded border border-black p-5 shadow-2xl">
+          <div className="drag-handle absolute top-1.5 right-1.5 z-10 cursor-move">🔧</div>
+          <h3> Box C</h3>
         </div>
-        <div key="d" className="border border-black rounded p-5 shadow-2xl relative">
-          <div className="drag-handle cursor-move z-10 absolute top-1.5 right-1.5">🔧</div>
+        <div key="d" className="relative rounded border border-black p-5 shadow-2xl">
+          <div className="drag-handle absolute top-1.5 right-1.5 z-10 cursor-move">🔧</div>
           <h3>Box D</h3>
         </div>
       </ResponsiveGridLayout>
