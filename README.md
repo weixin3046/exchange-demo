@@ -1,5 +1,6 @@
 ### 采用了 src 目录
 
+```
 /my-next-app
 ├── public/ # 静态资源
 │ ├── images/ # 图片资源
@@ -77,9 +78,11 @@
 ├── tsconfig.json # TypeScript 配置
 ├── package.json # 依赖管理
 └── README.md # 项目说明
+```
 
 ### 没有 src 目录
 
+```
 /my-next-app
 ├── public/ # 静态资源
 │ ├── images/ # 图片资源
@@ -156,3 +159,14 @@
 ├── tsconfig.json # TypeScript 配置
 ├── package.json # 依赖管理
 └── README.md # 项目说明
+```
+
+### **prettier** 解释
+
+| 配置项                   | 作用                                                            |
+| ------------------------ | --------------------------------------------------------------- |
+| `trailingComma`: `"es5"` | 在 ES5 支持的地方加尾随逗号（如对象、数组，但不包括函数参数）。 |
+| `tabWidth`: `2`          | 缩进为 2 个空格（默认值）。                                     |
+| `semi`: `true`           | 每行代码结尾加分号（false 则去掉分号）。                        |
+| `singleQuote`: `true`    | 使用单引号（默认是双引号 false）。                              |
+| `printWidth`: `120`      | 一行最多120个字符                                               |
