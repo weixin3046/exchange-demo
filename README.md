@@ -56,6 +56,7 @@
 │ │ ├── auth.ts # 认证相关
 │ │ ├── db.ts # 数据库连接
 │ │ ├── fetcher.ts # 封装 fetch
+│ │ ├── axiosInstance.ts # Axios 请求拦截器（推荐）
 │ │ ├── validation.ts # 数据验证
 │ │ ├── logger.ts # 日志记录
 │ │ ├── cache.ts # 缓存处理
@@ -142,6 +143,7 @@
 │ ├── auth.ts # 认证相关
 │ ├── db.ts # 数据库连接
 │ ├── fetcher.ts # 封装 fetch
+│ ├── axiosInstance.ts  # Axios 请求拦截器（推荐）
 │ ├── validation.ts # 数据验证
 │ ├── logger.ts # 日志记录
 │ ├── cache.ts # 缓存处理
