@@ -182,5 +182,3 @@
 | `semi`: `true`           | 每行代码结尾加分号（false 则去掉分号）。                        |
 | `singleQuote`: `true`    | 使用单引号（默认是双引号 false）。                              |
 | `printWidth`: `120`      | 一行最多120个字符                                               |
-
-测试分支保护
