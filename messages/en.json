@@ -1,4 +1,9 @@
 {
+    "Nav": {
+        "home": "HomePage",
+        "spot": "Spot",
+        "swap": "Futures"
+    },
     "HomePage": {
         "title": "Hello world!",
         "about": "Go to the about page"

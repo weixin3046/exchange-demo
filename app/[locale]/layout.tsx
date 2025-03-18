@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import Web3Provider from "@/components/Web3Provider";
 import { routing } from "@/i18n/routing";
 import "@/styles/globals.css";
@@ -35,10 +36,13 @@ export default async function LocaleLayout({
   }
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextIntlClientProvider>
-          <Web3Provider>{children}</Web3Provider>
+          <Web3Provider>
+            <Header />
+            {children}
+          </Web3Provider>
         </NextIntlClientProvider>
       </body>
     </html>
