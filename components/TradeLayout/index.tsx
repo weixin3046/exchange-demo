@@ -1,48 +1,58 @@
 "use client";
+import { useLayoutStore } from "@/store/layoutState";
 import { Layout, Layouts, Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import DragHandle from "./DragHandle";
+
+// TODO: 这里建议用zustand来做持久化
+// const getLayoutsFromLocalStorage = (): Layouts | null => {
+//   try {
+//     const savedLayouts = localStorage.getItem(LOCAL_STORAGE_KEY);
+//     return savedLayouts ? (JSON.parse(savedLayouts) as Layouts) : null;
+//   } catch (e) {
+//     console.error("Error loading layouts from localStorage", e);
+//     return null;
+//   }
+// };
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
+
 export default function TradeLayout() {
-  const layout = [
-    { i: "a", x: 0, y: 0, w: 12, h: 4 },
-    { i: "b", x: 4, y: 0, w: 4, h: 4 },
-    { i: "c", x: 0, y: 4, w: 2, h: 4 },
-    { i: "d", x: 2, y: 4, w: 2, h: 4 },
-  ];
-  const handleChangeLayout = (currentLayout: Layout[], allLayouts: Layouts) => {
-    console.log(currentLayout, allLayouts);
-    // 数据保存在本地
+  const { layouts, setLayouts } = useLayoutStore();
+
+  const handleLayoutChange = (_currentLayout: Layout[], allLayouts: Layouts) => {
+    setLayouts(allLayouts);
   };
+
   return (
-    <div style={{ margin: "50px" }}>
-      <h1>React Grid Layout Demo</h1>
+    <div>
       <ResponsiveGridLayout
         className="layout"
-        layouts={{ lg: layout, md: layout, sm: layout, xs: layout, xxs: layout }} // 定义布局
-        cols={{ lg: 12, md: 12, sm: 12, xs: 12, xxs: 12 }} // 每行的列数
-        rowHeight={60} // 每行的高度
-        width={1200} // 网格的宽度
-        isResizable={true} // 允许调整大小
-        isDraggable={true} // 允许拖动
+        layouts={layouts}
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        cols={{ lg: 10, md: 8, sm: 6 }}
+        margin={[3, 3]}
+        onLayoutChange={handleLayoutChange}
         draggableHandle=".drag-handle"
-        onLayoutChange={handleChangeLayout}
       >
-        <div key="a" className="relative rounded border border-black p-5 shadow-2xl">
-          <div className="drag-handle absolute top-1.5 right-1.5 z-10 cursor-move">🔧</div>
-          <h3>Box A</h3>
+        <div key="market-list" className="bg-gray-800 p-2 text-white">
+          <DragHandle>市场列表</DragHandle>
         </div>
-        <div key="b" className="relative rounded border border-black p-5 shadow-2xl">
-          <div className="drag-handle absolute top-1.5 right-1.5 z-10 cursor-move">🔧</div>
-          <h3>Box B</h3>
+        <div key="chart" className="bg-gray-900 p-2 text-white">
+          <DragHandle>K 线图</DragHandle>
         </div>
-        <div key="c" className="relative rounded border border-black p-5 shadow-2xl">
-          <div className="drag-handle absolute top-1.5 right-1.5 z-10 cursor-move">🔧</div>
-          <h3> Box C</h3>
+        <div key="order-book" className="bg-gray-800 p-2 text-white">
+          <DragHandle>订单簿</DragHandle>
         </div>
-        <div key="d" className="relative rounded border border-black p-5 shadow-2xl">
-          <div className="drag-handle absolute top-1.5 right-1.5 z-10 cursor-move">🔧</div>
-          <h3>Box D</h3>
+        <div key="order-panel" className="bg-gray-800 p-2 text-white">
+          <DragHandle>下单面板</DragHandle>
+        </div>
+        <div key="positions" className="bg-gray-900 p-2 text-white">
+          <DragHandle>持仓 & 订单</DragHandle>
+        </div>
+        <div key="information" className="bg-gray-900 p-2 text-white">
+          <DragHandle>币对信息</DragHandle>
         </div>
       </ResponsiveGridLayout>
     </div>

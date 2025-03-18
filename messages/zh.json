@@ -1,4 +1,9 @@
 {
+    "Nav": {
+        "home": "首页",
+        "spot": "现货",
+        "swap": "合约"
+    },
     "HomePage": {
         "title": "你好，世界！",
         "about": "去往About页面"
