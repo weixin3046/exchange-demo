@@ -1,3 +1,4 @@
+"use client";
 import { Layout, Layouts, Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 
