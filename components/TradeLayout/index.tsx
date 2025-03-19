@@ -41,6 +41,7 @@ export default function TradeLayout() {
         </div>
         <div key="chart" className="bg-gray-900 p-2 text-white">
           <DragHandle>K 线图</DragHandle>
+          {/* <CandlestickChart symbol="BTC/USDT" wsUrl="wss://wspri.okx.com:8443/ws/v5/ipublic" /> */}
         </div>
         <div key="order-book" className="bg-gray-800 p-2 text-white">
           <DragHandle>订单簿</DragHandle>
