@@ -1,9 +1,9 @@
 import { ConnectionState } from "@/types/socket";
+// type EVENT_TYPE = "open" | "close" | "error";
 
 class WebSocketManager {
   private websocket: WebSocket | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private eventListeners: Map<string, Set<(data: any) => void>> = new Map();
+  private eventListeners: Map<string, Set<(data: ConnectionState) => void>> = new Map();
   private retryCount = 0; // 当前重试次数
   private maxRetries = 3; // 最大重试次数
   private reconnectTimeout = 3000; // 重连间隔（毫秒）
@@ -66,14 +66,14 @@ class WebSocketManager {
     }
   }
 
-  public subscribe<T>(eventType: string, listener: (data: T) => void) {
+  public subscribe(eventType: string, listener: (data: ConnectionState) => void) {
     if (!this.eventListeners.has(eventType)) {
       this.eventListeners.set(eventType, new Set());
     }
     this.eventListeners.get(eventType)!.add(listener);
   }
 
-  public unsubscribe<T>(eventType: string, listener: (data: T) => void) {
+  public unsubscribe(eventType: string, listener: (data: ConnectionState) => void) {
     this.eventListeners.get(eventType)?.delete(listener);
   }
 
@@ -95,7 +95,7 @@ class WebSocketManager {
     }
   }
 
-  private dispatchEvent(eventType: string, data?: unknown) {
+  private dispatchEvent(eventType: string, data?: Event) {
     const listeners = this.eventListeners.get(eventType);
     if (listeners) {
       listeners.forEach((listener) => listener(data));

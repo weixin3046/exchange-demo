@@ -42,6 +42,28 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  --color-up: var(--color-green-text);
+  --color-down: var(--color-red-text);
+  --color-up-text: var(--color-green-text);
+  --color-down-text: var(--color-red-text);
+  --color-up-bg: var(--color-green-bg);
+  --color-down-bg: var(--color-red-bg);
+  --color-up-text-rgb: var(--color-green-text);
+  --color-down-text-rgb: var(--color-red-text);
+  --color-up-bg-rgb: var(--color-green-bg);
+  --color-down-bg-rgb: var(--color-red-bg);
+}
+
+@theme {
+  --color-red-text: #ca3f64;
+  --color-red-bg: #ca3f64;
+  --color-green-text: #25a750;
+  --color-green-bg: #25a750;
+  /* --color-red-text-rgb: 202, 63, 100;
+  --color-red-bg-rgb: 202, 63, 100;
+  --color-green-text-rgb: 37, 167, 80;
+  --color-green-bg-rgb: 37, 167, 80; */
 }
 
 :root {
