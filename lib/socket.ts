@@ -95,10 +95,10 @@ class WebSocketManager {
     }
   }
 
-  private dispatchEvent(eventType: string, data?: Event) {
+  private dispatchEvent(eventType: string, data?: ConnectionState | MessageEvent | Event | { message: string }) {
     const listeners = this.eventListeners.get(eventType);
     if (listeners) {
-      listeners.forEach((listener) => listener(data));
+      listeners.forEach((listener) => listener(data as ConnectionState));
     }
   }
 }
