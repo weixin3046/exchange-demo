@@ -29,3 +29,16 @@ export interface RawDepthData {
   asks: [string, string][]; // [价格, 数量]
   buys: [string, string][]; // 注意：API返回的是buys，不是bids
 }
+
+export interface TradeData {
+  amount: string;
+  ds: string;
+  price: string;
+  side: string;
+  ts: number;
+  vol: string;
+}
+
+export interface TradeTickData {
+  data: TradeData[];
+}

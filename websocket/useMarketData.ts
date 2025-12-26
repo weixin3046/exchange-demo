@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DepthCalculator } from "./depth-calculator";
-import { DepthData, RawDepthData } from "./types/market";
+import { DepthData, RawDepthData, TradeData, TradeTickData } from "./types/market";
 import { useWebSocket } from "./useWebSocket";
 
 interface MarketTicker {
@@ -15,19 +15,6 @@ interface MarketTicker {
   bidVolume: string;
   askPrice: string;
   askVolume: string;
-}
-
-interface TradeData {
-  amount: string;
-  ds: string;
-  price: string;
-  side: string;
-  ts: number;
-  vol: string;
-}
-
-interface TradeTickData {
-  data: TradeData[];
 }
 
 interface KlineData {
@@ -70,7 +57,7 @@ export function useMarketData(symbol: string = "btcusdt") {
         setTradeData((prev) => {
           const newTrades = [...tradeTick.data];
           // 只保留最新的100条交易记录
-          return [...newTrades, ...prev].slice(0, 5);
+          return [...newTrades, ...prev].slice(0, 100);
         });
       }
     });

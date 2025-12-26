@@ -3,10 +3,11 @@ import { useMarketData } from "@/websocket/useMarketData";
 import { useState } from "react";
 import { DepthChart } from "./DepthChart";
 import { DepthTable } from "./DepthTable";
+import NewTrade from "./NewTrade";
 
 export default function MarketPage() {
   const [selectedSymbol, setSelectedSymbol] = useState("btcusdt");
-  const [depthLevels, setDepthLevels] = useState(10);
+  const [depthLevels, setDepthLevels] = useState(12);
 
   const { tickerData, tradeData, depthData, priceSummary, klineData, loading, isConnected, changeKlineInterval } =
     useMarketData(selectedSymbol);
@@ -74,24 +75,25 @@ export default function MarketPage() {
         </div>
 
         {/* 实时成交 */}
-        <div className="rounded-lg bg-amber-500 p-4 shadow lg:col-span-2">
+        <NewTrade tradeData={tradeData} />
+        {/* <div className="rounded-lg bg-amber-500 p-4 shadow lg:col-span-2">
           <h2 className="mb-4 text-xl font-semibold">实时成交</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y">
               <thead>
                 <tr>
-                  <th className="px-4 py-2 text-left">时间</th>
                   <th className="px-4 py-2 text-left">价格</th>
                   <th className="px-4 py-2 text-left">数量</th>
+                  <th className="px-4 py-2 text-left">时间</th>
                   <th className="px-4 py-2 text-left">方向</th>
                 </tr>
               </thead>
               <tbody>
                 {tradeData.slice(0, 10).map((trade, index) => (
                   <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-2">{trade.ds.split(" ")[1]}</td>
                     <td className="px-4 py-2">${parseFloat(trade.price).toLocaleString()}</td>
                     <td className="px-4 py-2">{parseFloat(trade.vol).toFixed(4)}</td>
+                    <td className="px-4 py-2">{trade.ds.split(" ")[1]}</td>
                     <td className="px-4 py-2">
                       <span className={trade.side === "BUY" ? "text-green-600" : "text-red-600"}>
                         {trade.side === "BUY" ? "买入" : "卖出"}
@@ -102,7 +104,7 @@ export default function MarketPage() {
               </tbody>
             </table>
           </div>
-        </div>
+        </div> */}
 
         {/* K线周期选择 */}
         <div className="rounded-lg bg-amber-500 p-4 shadow lg:col-span-3">
@@ -190,7 +192,7 @@ export default function MarketPage() {
           </div>
 
           {/* 深度表格 */}
-          <div className="rounded-lg bg-white p-4 shadow">
+          <div className="rounded-lg p-4 shadow">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-xl font-semibold">深度表格</h2>
               <div className="flex items-center space-x-2">

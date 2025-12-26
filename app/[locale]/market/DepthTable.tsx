@@ -1,4 +1,5 @@
 // components/market/DepthTable.tsx
+import { cn } from "@/lib/utils";
 import { DepthData, DepthItem } from "@/websocket/types/market";
 import React from "react";
 
@@ -31,16 +32,24 @@ export const DepthTable: React.FC<DepthTableProps> = ({
     const widthPercentage = maxCumulativeVolume > 0 ? ((item.cumulativeVolume || 0) / maxCumulativeVolume) * 100 : 0;
 
     return (
-      <div key={`${isAsk ? "ask" : "bid"}-${index}`} className="relative flex h-8 items-center hover:bg-gray-50">
+      <div
+        key={`${isAsk ? "ask" : "bid"}-${index}`}
+        className="relative flex h-6.5 items-center overflow-hidden text-xs font-medium hover:bg-gray-50"
+      >
         {/* 背景色条 */}
         <div
-          className={`absolute inset-0 ${isAsk ? "bg-red-50" : "bg-green-50"}`}
-          style={{ width: `${widthPercentage}%` }}
+          className={cn(
+            isAsk ? "bg-down-bg-rgb/15" : "bg-up-bg-rgb/15",
+            `absolute left-full h-[calc(100%-2px)] w-full transition duration-300 ease-in-out`
+          )}
+          style={{
+            transform: "translate3d(-" + widthPercentage + "%, 0px, 0px)",
+          }}
         />
 
         <div className="relative z-10 flex w-full px-4">
           {/* 价格 */}
-          <div className={`w-1/3 font-mono ${isAsk ? "text-red-600" : "text-green-600"}`}>
+          <div className={`w-1/3 ${isAsk ? "text-down-text" : "text-up-text"}`}>
             {item.price.toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -48,7 +57,7 @@ export const DepthTable: React.FC<DepthTableProps> = ({
           </div>
 
           {/* 数量 */}
-          <div className="w-1/3 text-right font-mono text-black">
+          <div className="w-1/3 text-right">
             {item.volume.toLocaleString(undefined, {
               minimumFractionDigits: 4,
               maximumFractionDigits: 4,
@@ -56,7 +65,7 @@ export const DepthTable: React.FC<DepthTableProps> = ({
           </div>
 
           {/* 累计 */}
-          <div className="w-1/3 text-right font-mono text-gray-500">
+          <div className="w-1/3 text-right">
             {(item.cumulativeVolume || 0).toLocaleString(undefined, {
               minimumFractionDigits: 4,
               maximumFractionDigits: 4,
@@ -68,34 +77,34 @@ export const DepthTable: React.FC<DepthTableProps> = ({
   };
 
   return (
-    <div className={`rounded-lg bg-white shadow ${className}`}>
+    <div className={`rounded-lg shadow ${className}`}>
       {/* 表头 */}
-      <div className="flex border-b bg-gray-50 px-4 py-2">
+      <div className="flex border-b px-4 py-2">
         <div className="w-1/3 font-semibold">价格 (USD)</div>
         <div className="w-1/3 text-right font-semibold">数量 (BTC)</div>
         <div className="w-1/3 text-right font-semibold">累计</div>
       </div>
 
       {/* 卖单 */}
-      <div className="space-y-1 border-b">{displayAsks.map((item, index) => renderDepthRow(item, true, index))}</div>
+      <div className="space-y-1.5 border-b">{displayAsks.map((item, index) => renderDepthRow(item, true, index))}</div>
 
       {/* 中间价（如果有的话） */}
       {depthData.total && (
-        <div className="border-b bg-blue-50 px-4 py-2">
+        <div className="border-b px-4 py-2">
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-blue-700">盘口汇总</span>
+            <span className="font-semibold text-blue-700">汇总</span>
             <div className="flex space-x-6">
               <div>
                 <span className="text-gray-600">卖单总量: </span>
-                <span className="font-mono text-black">{depthData.total.totalAskVolume.toFixed(4)} BTC</span>
+                <span className="font-mono">{depthData.total.totalAskVolume.toFixed(4)} BTC</span>
               </div>
               <div>
                 <span className="text-gray-600">买单总量: </span>
-                <span className="font-mono text-black">{depthData.total.totalBidVolume.toFixed(4)} BTC</span>
+                <span className="font-mono">{depthData.total.totalBidVolume.toFixed(4)} BTC</span>
               </div>
               <div>
                 <span className="text-gray-600">买卖比: </span>
-                <span className="font-mono text-black">{depthData.total.bidAskRatio.toFixed(2)}</span>
+                <span className="font-mono">{depthData.total.bidAskRatio.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -103,7 +112,7 @@ export const DepthTable: React.FC<DepthTableProps> = ({
       )}
 
       {/* 买单 */}
-      <div className="space-y-1 border-b">{displayBids.map((item, index) => renderDepthRow(item, false, index))}</div>
+      <div className="space-y-1.5 border-b">{displayBids.map((item, index) => renderDepthRow(item, false, index))}</div>
 
       {/* 总计信息 */}
       {showTotals && depthData.total && (
