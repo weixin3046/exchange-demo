@@ -1,5 +1,7 @@
 import Header from "@/components/Header";
+import ThemeProvider from "@/components/ThemeProvider";
 import Web3Provider from "@/components/Web3Provider";
+import { WebSocketProvider } from "@/components/WebSocketProvider";
 import { routing } from "@/i18n/routing";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
@@ -36,14 +38,18 @@ export default async function LocaleLayout({
   }
 
   return (
-    <html lang={locale} className="dark">
+    <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <NextIntlClientProvider>
-          <Web3Provider>
-            <Header />
-            {children}
-          </Web3Provider>
-        </NextIntlClientProvider>
+        <ThemeProvider>
+          <NextIntlClientProvider>
+            <WebSocketProvider url="wss://wspri.okx.com:8443/ws/v5/ipublic">
+              <Web3Provider>
+                <Header />
+                {children}
+              </Web3Provider>
+            </WebSocketProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
