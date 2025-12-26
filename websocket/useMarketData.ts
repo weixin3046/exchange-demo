@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { DepthCalculator } from "./depth-calculator";
+import { DepthData, RawDepthData } from "./types/market";
 import { useWebSocket } from "./useWebSocket";
 
 interface MarketTicker {
@@ -28,11 +30,6 @@ interface TradeTickData {
   data: TradeData[];
 }
 
-interface DepthData {
-  asks: [string, string][];
-  buys: [string, string][];
-}
-
 interface KlineData {
   amount: number;
   close: number;
@@ -47,9 +44,10 @@ interface KlineData {
 export function useMarketData(symbol: string = "btcusdt") {
   const [tickerData, setTickerData] = useState<MarketTicker | null>(null);
   const [tradeData, setTradeData] = useState<TradeData[]>([]);
-  const [depthData, setDepthData] = useState<DepthData | null>(null);
+  //   const [depthData, setDepthData] = useState<DepthData | null>(null);
   const [klineData, setKlineData] = useState<KlineData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [rawDepthData, setRawDepthData] = useState<RawDepthData | null>(null);
 
   const { subscribe, unsubscribe, isConnected, switchTimezone } = useWebSocket({
     url: "wss://ws.coobit.cc/kline-api/ws",
@@ -72,18 +70,52 @@ export function useMarketData(symbol: string = "btcusdt") {
         setTradeData((prev) => {
           const newTrades = [...tradeTick.data];
           // 只保留最新的100条交易记录
-          return [...newTrades, ...prev].slice(0, 100);
+          return [...newTrades, ...prev].slice(0, 5);
         });
       }
     });
   }, [symbol, subscribe]);
 
+  // 计算处理后的深度数据
+  const depthData: DepthData | null = useMemo(() => {
+    if (!rawDepthData) return null;
+
+    try {
+      return DepthCalculator.calculateDepthData(rawDepthData, 20);
+    } catch (error) {
+      console.error("Error calculating depth data:", error);
+      return null;
+    }
+  }, [rawDepthData]);
+
   // 订阅盘口
   const subscribeDepth = useCallback(() => {
     subscribe(`market_${symbol}_depth_step0`, {}, (data) => {
-      setDepthData(data.data);
+      //   setDepthData(data.data);
+      setRawDepthData(data.data);
     });
   }, [symbol, subscribe]);
+
+  // 获取价格汇总信息
+  const priceSummary = useMemo(() => {
+    if (!depthData) return null;
+    return DepthCalculator.getPriceSummary(depthData);
+  }, [depthData]);
+
+  // 获取累计深度（用于图表）
+  const cumulativeDepth = useMemo(() => {
+    if (!depthData) return null;
+    return DepthCalculator.getCumulativeDepth(depthData, 50);
+  }, [depthData]);
+
+  // 查找特定价格的深度
+  const getDepthAtPrice = useCallback(
+    (price: number) => {
+      if (!depthData) return null;
+      return DepthCalculator.findDepthAtPrice(depthData, price);
+    },
+    [depthData]
+  );
 
   // 订阅K线
   const subscribeKline = useCallback(
@@ -131,12 +163,23 @@ export function useMarketData(symbol: string = "btcusdt") {
   );
 
   return {
+    // 原始数据
     tickerData,
     tradeData,
-    depthData,
+    depthData, // 计算后的深度数据
+    rawDepthData,
     klineData,
+
+    // 计算数据
+    priceSummary,
+    cumulativeDepth,
+    getDepthAtPrice,
+
+    // 状态
     loading,
     isConnected,
+
+    // 方法
     changeKlineInterval,
     unsubscribeAll,
   };

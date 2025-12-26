@@ -1,5 +1,4 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import OrderBook from "../OrderBook";
 
 export default function Order() {
   return (
@@ -10,9 +9,7 @@ export default function Order() {
         </TabsTrigger>
         <TabsTrigger value="order_list">Order List</TabsTrigger>
       </TabsList>
-      <TabsContent value="order_book">
-        <OrderBook />
-      </TabsContent>
+      <TabsContent value="order_book">{/* <OrderBook /> */}</TabsContent>
       <TabsContent value="order_list">Change your password here.</TabsContent>
     </Tabs>
   );

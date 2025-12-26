@@ -1,20 +1,15 @@
 "use client";
 import { useMarketData } from "@/websocket/useMarketData";
 import { useState } from "react";
+import { DepthChart } from "./DepthChart";
+import { DepthTable } from "./DepthTable";
 
 export default function MarketPage() {
   const [selectedSymbol, setSelectedSymbol] = useState("btcusdt");
-  //   const { tickerData, tradeData, klineData, loading, isConnected, changeKlineInterval } = useMarketData(selectedSymbol);
+  const [depthLevels, setDepthLevels] = useState(10);
 
-  const {
-    tickerData,
-    tradeData,
-    // depthData,
-    klineData,
-    loading,
-    isConnected,
-    changeKlineInterval,
-  } = useMarketData("btcusdt");
+  const { tickerData, tradeData, depthData, priceSummary, klineData, loading, isConnected, changeKlineInterval } =
+    useMarketData(selectedSymbol);
 
   if (loading) {
     return (
@@ -145,6 +140,80 @@ export default function MarketPage() {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="container mx-auto p-4">
+        <h1 className="mb-6 text-2xl font-bold">盘口深度</h1>
+
+        {priceSummary && (
+          <div className="mb-6 rounded-lg bg-amber-500 p-4 shadow">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <div>
+                <div className="text-sm text-gray-500">最佳买价</div>
+                <div className="text-2xl font-bold text-green-600">${priceSummary.bestBid.toFixed(2)}</div>
+                <div className="text-sm text-gray-500">数量: {priceSummary.bestBidVolume.toFixed(4)} BTC</div>
+              </div>
+
+              <div>
+                <div className="text-sm text-gray-500">最佳卖价</div>
+                <div className="text-2xl font-bold text-red-600">${priceSummary.bestAsk.toFixed(2)}</div>
+                <div className="text-sm text-gray-500">数量: {priceSummary.bestAskVolume.toFixed(4)} BTC</div>
+              </div>
+
+              <div>
+                <div className="text-sm text-gray-500">价差</div>
+                <div className="text-2xl font-bold">${priceSummary.spread.toFixed(2)}</div>
+                <div className="text-sm text-gray-500">{priceSummary.spreadPercentage.toFixed(4)}%</div>
+              </div>
+
+              <div>
+                <div className="text-sm text-gray-500">中间价</div>
+                <div className="text-2xl font-bold text-blue-600">${priceSummary.midPrice.toFixed(2)}</div>
+                <div className="text-sm text-gray-500">
+                  买/卖: {(priceSummary.bestBidVolume / priceSummary.bestAskVolume).toFixed(2)}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* 深度图表 */}
+          <div className="rounded-lg bg-white p-4 shadow">
+            <h2 className="mb-4 text-xl font-semibold">深度图表</h2>
+            {depthData ? (
+              <DepthChart depthData={depthData} height={400} />
+            ) : (
+              <div className="flex h-40 items-center justify-center">暂无深度数据</div>
+            )}
+          </div>
+
+          {/* 深度表格 */}
+          <div className="rounded-lg bg-white p-4 shadow">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold">深度表格</h2>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">显示档位:</span>
+                <select
+                  value={depthLevels}
+                  onChange={(e) => setDepthLevels(Number(e.target.value))}
+                  className="rounded border px-2 py-1"
+                >
+                  <option value={10}>10档</option>
+                  <option value={20}>20档</option>
+                  <option value={30}>30档</option>
+                  <option value={50}>50档</option>
+                </select>
+              </div>
+            </div>
+
+            {depthData ? (
+              <DepthTable depthData={depthData} maxLevels={depthLevels} showTotals={true} />
+            ) : (
+              <div className="flex h-40 items-center justify-center">暂无深度数据</div>
+            )}
+          </div>
         </div>
       </div>
     </div>
