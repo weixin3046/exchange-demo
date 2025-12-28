@@ -1,19 +1,17 @@
 "use client";
-import { DepthData } from "@/websocket/types/market";
-import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { DepthData, TradeData } from "@/websocket/types/market";
 import OrderItem from "./OrderItem";
 
 interface DepthTableProps {
   depthData: DepthData;
   maxLevels?: number;
-  showTotals?: boolean;
+  // showTotals?: boolean;
   className?: string;
+  latestTrade: TradeData;
 }
 
-export default function OrderBook({ depthData, maxLevels = 10 }: DepthTableProps) {
-  const [currentType] = useState(0);
-  // const [change] = useState(5); // 判断涨跌
-
+export default function OrderBook({ depthData, maxLevels = 10, className, latestTrade }: DepthTableProps) {
   const { asks, bids } = depthData;
 
   // 限制显示数量
@@ -27,33 +25,39 @@ export default function OrderBook({ depthData, maxLevels = 10 }: DepthTableProps
   );
 
   return (
-    <div>
-      <div className="text-text-tertiary mb-2 flex items-center justify-between text-xs font-medium">
-        <div className="flex-1">Price(USDT)</div>
-        <div className="flex-1 text-right">Amount(BTC)</div>
-        <div className="flex-1 text-right">Total(BTC)</div>
+    <div className={`rounded-lg shadow ${className}`}>
+      {/* 表头 */}
+      <div className="text-text-tertiary mb-2 flex items-center text-xs font-medium">
+        <div className="w-1/3 font-semibold">价格 (USD)</div>
+        <div className="w-1/3 text-right font-semibold">数量 (BTC)</div>
+        <div className="w-1/3 text-right font-semibold">累计</div>
       </div>
+      {/* 卖单 */}
       <div>
-        {currentType === 0 &&
-          displayAsks?.map((item, index) => (
-            <OrderItem key={index} isAsk maxCumulativeVolume={maxCumulativeVolume} item={item} />
-          ))}
+        {displayAsks?.map((item, index) => (
+          <OrderItem key={index} isAsk maxCumulativeVolume={maxCumulativeVolume} item={item} />
+        ))}
       </div>
-      <div>
-        <div className="flex items-center">
-          {/* <button className={cn("text-lg font-semibold", change >= 0 ? "text-down-text" : "text-up-text")}>
-            85,954.0
-          </button> */}
-          {/* {change >= 0 && <ArrowUp className="text-down-text text-lg" />} */}
-          {/* {change < 0 && <ArrowDown className="text-up-text text-lg" />} */}
+      {/* 中间价（如果有的话） */}
+      {latestTrade && (
+        <div>
+          <div className="flex items-center">
+            <button
+              className={cn("text-lg font-semibold", latestTrade.side === "BUY" ? "text-up-text" : "text-down-text")}
+            >
+              {latestTrade.price}
+            </button>
+            {/* {change >= 0 && <ArrowUp className="text-down-text text-lg" />} */}
+            {/* {change < 0 && <ArrowDown className="text-up-text text-lg" />} */}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* 买单 */}
       <div>
-        {currentType === 0 &&
-          displayBids.map((item, index) => (
-            <OrderItem key={index} isAsk={false} maxCumulativeVolume={maxCumulativeVolume} item={item} />
-          ))}
-        {/* {currentType === 1 && <OrderItem type={"buy"} item={[]} />} */}
+        {displayBids.map((item, index) => (
+          <OrderItem key={index} isAsk={false} maxCumulativeVolume={maxCumulativeVolume} item={item} />
+        ))}
       </div>
     </div>
   );

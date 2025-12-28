@@ -16,22 +16,6 @@ export default function OrderItem({
   maxCumulativeVolume: number;
 }) {
   const widthPercentage = maxCumulativeVolume > 0 ? ((item.cumulativeVolume || 0) / maxCumulativeVolume) * 100 : 0;
-  // const [radio, setRadio] = useState(0);
-  // const total = useMemo(() => {
-  //   return Number((Number(item[0]) * Number(item[1])).toFixed(2));
-  // }, [item]);
-  // const radio = useMemo(() => {
-  //   if (item.length > 0 && total > 0) {
-  //     return (Number(item[2]) / (Number(item[1]) * Number(item[2]))) * 100;
-  //   }
-  //   return 0;
-  // }, [item, total]);
-
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     setRadio(Math.floor(Math.random() * 100));
-  //   }, 1000);
-  // }, []);
 
   return (
     <div
@@ -41,21 +25,21 @@ export default function OrderItem({
       }}
     >
       {/* 价格 */}
-      <div className={cn("flex-1", isAsk ? "text-down-text" : "text-up-text")}>
+      <div className={cn("w-1/3", isAsk ? "text-up-text" : "text-down-text")}>
         {item.price.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}
       </div>
       {/* 数量 */}
-      <div className="flex-1 text-right">
+      <div className="w-1/3 text-right">
         {item.volume.toLocaleString(undefined, {
           minimumFractionDigits: 4,
           maximumFractionDigits: 4,
         })}
       </div>
       {/* 累计 */}
-      <div className="flex-1 text-right">
+      <div className="w-1/3 text-right">
         {(item.cumulativeVolume || 0).toLocaleString(undefined, {
           minimumFractionDigits: 4,
           maximumFractionDigits: 4,

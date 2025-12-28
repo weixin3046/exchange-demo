@@ -1,5 +1,7 @@
 "use client";
 import { useLayoutStore } from "@/store/layoutState";
+import { useMarketData } from "@/websocket/useMarketData";
+import { useState } from "react";
 import { Layout, Layouts, Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -22,9 +24,20 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export default function TradeLayout() {
   const { layouts, setLayouts } = useLayoutStore();
-
+  const [selectedSymbol, setSelectedSymbol] = useState("btcusdt");
+  // const [depthLevels, setDepthLevels] = useState(12);
+  const { tradeData, depthData } = useMarketData(selectedSymbol);
   const handleLayoutChange = (_currentLayout: Layout[], allLayouts: Layouts) => {
     setLayouts(allLayouts);
+  };
+
+  const handleListClick = (e: React.MouseEvent<HTMLUListElement>) => {
+    if (e.target instanceof HTMLLIElement) {
+      const value = e.target.dataset.value;
+      if (value) {
+        setSelectedSymbol(value);
+      }
+    }
   };
 
   return (
@@ -40,6 +53,20 @@ export default function TradeLayout() {
       >
         <div key="market-list" className="bg-gray-800 p-2 text-white">
           <DragHandle>市场列表</DragHandle>
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold">数字货币市场</h1>
+            <ul onClick={handleListClick} className="py-3">
+              <li className="cursor-pointer p-2 hover:bg-gray-700" data-value="btcusdt">
+                BTC/USDT
+              </li>
+              <li className="cursor-pointer p-2 hover:bg-gray-700" data-value="ethusdt">
+                ETH/USDT
+              </li>
+              <li className="cursor-pointer p-2 hover:bg-gray-700" data-value="bnbusdt">
+                BNB/USDT
+              </li>
+            </ul>
+          </div>
         </div>
         <div key="chart" className="bg-gray-900 p-2 text-white">
           <DragHandle>K 线图</DragHandle>
@@ -47,7 +74,11 @@ export default function TradeLayout() {
         </div>
         <div key="order-book" className="bg-gray-800 p-2 text-white">
           <DragHandle>订单簿</DragHandle>
-          <Order />
+          {depthData ? (
+            <Order depthData={depthData} tradeData={tradeData} />
+          ) : (
+            <div className="flex h-40 items-center justify-center">暂无深度数据</div>
+          )}
         </div>
         <div key="order-panel" className="bg-gray-800 p-2 text-white">
           <DragHandle>下单面板</DragHandle>

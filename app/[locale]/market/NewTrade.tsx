@@ -22,14 +22,14 @@ function RowComponent({
 
 export default function NewTrade({ tradeData }: { tradeData: TradeData[] }) {
   return (
-    <div className="w-[276px] rounded-lg bg-amber-500 p-4 shadow lg:col-span-2">
-      <div className="flex w-full text-gray-300">
-        <div className="w-1/3">价格</div>
-        <div className="w-1/3 text-right">数量</div>
-        <div className="w-1/3 text-right">时间</div>
+    <div className="rounded-lg shadow lg:col-span-2">
+      <div className="text-text-tertiary mb-2 flex items-center text-xs font-medium">
+        <div className="w-1/3 font-semibold">价格</div>
+        <div className="w-1/3 text-right font-semibold">数量</div>
+        <div className="w-1/3 text-right font-semibold">时间</div>
       </div>
-      <div className="h-[360px]">
-        <List rowComponent={RowComponent} rowCount={tradeData.length} rowHeight={30} rowProps={{ tradeData }} />
+      <div className="h-[360px] text-xs font-medium">
+        <List rowComponent={RowComponent} rowCount={tradeData.length} rowHeight={20} rowProps={{ tradeData }} />
       </div>
     </div>
   );

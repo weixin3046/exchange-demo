@@ -7,7 +7,7 @@ import NewTrade from "./NewTrade";
 
 export default function MarketPage() {
   const [selectedSymbol, setSelectedSymbol] = useState("btcusdt");
-  const [depthLevels, setDepthLevels] = useState(12);
+  const [depthLevels, setDepthLevels] = useState(10);
 
   const { tickerData, tradeData, depthData, priceSummary, klineData, loading, isConnected, changeKlineInterval } =
     useMarketData(selectedSymbol);

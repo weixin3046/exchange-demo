@@ -1,4 +1,3 @@
-// components/market/DepthTable.tsx
 import { cn } from "@/lib/utils";
 import { DepthData, DepthItem } from "@/websocket/types/market";
 import React from "react";
@@ -49,7 +48,7 @@ export const DepthTable: React.FC<DepthTableProps> = ({
 
         <div className="relative z-10 flex w-full px-4">
           {/* 价格 */}
-          <div className={`w-1/3 ${isAsk ? "text-down-text" : "text-up-text"}`}>
+          <div className={`w-1/3 ${isAsk ? "text-up-text" : "text-down-text"}`}>
             {item.price.toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
