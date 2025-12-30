@@ -1,167 +1,94 @@
+import { SUPPORTED_RESOLUTIONS } from "@/constants";
 import {
-  DatafeedErrorCallback,
   HistoryCallback,
+  IBasicDataFeed,
   LibrarySymbolInfo,
   OnReadyCallback,
   PeriodParams,
   ResolutionString,
   ResolveCallback,
   SubscribeBarsCallback,
-} from "@/public/charting_library/charting_library";
+} from "@/public/charting_library";
+import { subscribeOnStream, unsubscribeFromStream } from "./streaming";
 
-const configurationData = {
-  // Represents the resolutions for bars supported by your datafeed
-  supported_resolutions: ["1", "5", "15", "60", "180", "1D", "1W", "1M"] as ResolutionString[],
-  // The `exchanges` arguments are used for the `searchSymbols` method if a user selects the exchange
-  exchanges: [
-    { value: "Bitfinex", name: "Bitfinex", desc: "Bitfinex" },
-    { value: "Kraken", name: "Kraken", desc: "Kraken bitcoin exchange" },
-  ],
-  // The `symbols_types` arguments are used for the `searchSymbols` method if a user selects this symbol type
-  symbols_types: [{ name: "crypto", value: "crypto" }],
-};
-
-async function getAllSymbols() {
-  const allSymbols = [
-    {
-      symbol: "BTC",
-      ticker: "",
-      description: "btc",
-      exchange: "btc",
-      type: "crypto",
-    },
-  ];
-
-  return allSymbols;
-}
-
-const dataFeed = {
-  onReady: (callback: OnReadyCallback) => {
-    setTimeout(() =>
+const resolutionValues = SUPPORTED_RESOLUTIONS.map((item) => item.value.toString());
+// const webSocketManager = getWebSocketManager();
+export class DataFeed extends EventTarget implements IBasicDataFeed {
+  private lastBarsCache = new Map();
+  onReady(callback: OnReadyCallback) {
+    console.log("[onReady]: Method call");
+    setTimeout(() => {
       callback({
-        supported_resolutions: configurationData.supported_resolutions,
+        supported_resolutions: resolutionValues as ResolutionString[],
         supports_marks: false,
         supports_timescale_marks: false,
         supports_time: true,
-      })
-    );
-  },
-  searchSymbols: () => {
+      });
+    });
+  }
+  searchSymbols() {
     console.log("[searchSymbols]: Method call");
-  },
-  resolveSymbol: async (
-    symbolName: string,
-    onSymbolResolvedCallback: ResolveCallback,
-    onResolveErrorCallback: DatafeedErrorCallback
-  ) => {
-    const symbols = await getAllSymbols();
-    const symbolItem = symbols.find(({ ticker }) => ticker === symbolName);
-    if (!symbolItem) {
-      console.log("[resolveSymbol]: Cannot resolve symbol", symbolName);
-      onResolveErrorCallback("unknown_symbol"); // Displays the ghost icon
-      return;
-    }
+  }
+  resolveSymbol(symbolName: string, onResolve: ResolveCallback) {
     const symbolInfo: LibrarySymbolInfo = {
-      ticker: symbolItem.ticker,
-      name: symbolItem.symbol,
-      description: symbolItem.description,
-      type: symbolItem.type,
-      exchange: symbolItem.exchange,
-      listed_exchange: symbolItem.exchange,
+      unit_id: "jerry",
+      name: symbolName,
+      type: "crypto",
+      description: `${symbolName}/USD`,
+      ticker: symbolName,
       session: "24x7",
-      timezone: "Etc/UTC",
       minmov: 1,
-      pricescale: 10000,
+      timezone: "Etc/UTC",
       has_intraday: true,
-      intraday_multipliers: ["1", "60"],
       has_daily: true,
-      daily_multipliers: ["1"],
-      visible_plots_set: "ohlcv",
-      supported_resolutions: configurationData.supported_resolutions,
-      volume_precision: 2,
+      currency_code: "USD",
       data_status: "streaming",
+      visible_plots_set: "ohlc",
+      exchange: "GMX",
+      listed_exchange: "GMX",
       format: "price",
+      pricescale: 1000,
     };
-    console.log("symbolInfo=====", symbolInfo, "");
-    onSymbolResolvedCallback(symbolInfo);
-  },
-  getBars: (
+
+    setTimeout(() => {
+      onResolve(symbolInfo);
+    }, 0);
+  }
+  getBars(
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,
     periodParams: PeriodParams,
-    onResult: HistoryCallback,
-    onError: DatafeedErrorCallback
-  ) => {
-    try {
-      const { from, to } = periodParams;
-      console.log("[getBars mock]", symbolInfo.ticker, resolution, from, to);
-
-      // ===== 1️⃣ resolution -> 秒数 =====
-      let stepSec: number;
-
-      if (resolution === "1") {
-        stepSec = 60;
-      } else if (resolution === "60") {
-        stepSec = 60 * 60;
-      } else if (resolution === "1D") {
-        stepSec = 24 * 60 * 60;
-      } else {
-        onError(`Invalid resolution: ${resolution}`);
-        return;
-      }
-
-      // ===== 2️⃣ 控制返回数量 =====
-      const MAX_BARS = 300;
-      let current = from;
-      let price = 50000; // 初始价格（写死）
-
-      const bars: any[] = [];
-
-      while (current < to && bars.length < MAX_BARS) {
-        // 模拟价格波动
-        const open = price;
-        const change = (Math.random() - 0.5) * 200; // ±100
-        const close = open + change;
-
-        const high = Math.max(open, close) + Math.random() * 50;
-        const low = Math.min(open, close) - Math.random() * 50;
-
-        bars.push({
-          time: current * 1000, // TradingView 必须是毫秒
-          open: Number(open.toFixed(2)),
-          high: Number(high.toFixed(2)),
-          low: Number(low.toFixed(2)),
-          close: Number(close.toFixed(2)),
-          volume: Math.floor(Math.random() * 10 + 1),
-        });
-
-        price = close;
-        current += stepSec;
-      }
-
-      console.log(`[getBars mock]: returned ${bars.length} bars`);
-
-      if (bars.length === 0) {
-        onResult([], { noData: true });
-      } else {
-        onResult(bars, { noData: false });
-      }
-    } catch (err) {
-      console.error("[getBars mock error]", err);
-      onError("getBars mock error");
-    }
-  },
-  subscribeBars: (
+    onResult: HistoryCallback
+  ) {
+    //  const { from, to, firstDataRequest } = periodParams;
+    //  if (firstDataRequest) {
+    //             this.lastBarsCache.set(symbolInfo.ticker, { });
+    //         }
+    onResult([], { noData: true });
+  }
+  subscribeBars(
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,
     onTick: SubscribeBarsCallback,
-    listenerGuid: string
-  ) => {
-    console.log("[subscribeBars]: Method call with subscriberUID:", listenerGuid);
-  },
-  unsubscribeBars: (listenerGuid: string) => {
-    console.log("[unsubscribeBars]: Method call with subscriberUID:", listenerGuid);
-  },
-};
-
-export default dataFeed;
+    listenerGuid: string,
+    onResetCacheNeededCallback: () => void
+  ) {
+    console.log(symbolInfo);
+    subscribeOnStream(
+      symbolInfo,
+      resolution,
+      onTick,
+      listenerGuid,
+      onResetCacheNeededCallback,
+      // Pass the last bar from cache if available
+      this.lastBarsCache.get(symbolInfo.ticker)
+    );
+  }
+  unsubscribeBars(subscriberUID: string) {
+    unsubscribeFromStream(subscriberUID);
+  }
+  destroy() {
+    // Object.values(this.subscriptions).forEach((subscription) => subscription.destroy());
+    // document.removeEventListener("visibilitychange", this.visibilityHandler);
+  }
+}

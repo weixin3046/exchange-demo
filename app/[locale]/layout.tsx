@@ -41,7 +41,7 @@ export default async function LocaleLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
           <NextIntlClientProvider>
-            {/* <WebSocketProvider url="wss://wspri.okx.com:8443/ws/v5/ipublic"> */}
+            {/* <WebSocketProvider> */}
             <Web3Provider>
               <Header />
               {children}

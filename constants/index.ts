@@ -28,3 +28,14 @@ export const DEFAULT_LAYOUTS: Layouts = {
     { i: "information", x: 0, y: 21, w: 6, h: 3 }, // 资讯区最下面
   ],
 };
+
+export const SUPPORTED_RESOLUTIONS = [
+  { value: "1", label: "1min" },
+  { value: "5", label: "5min" },
+  { value: "15", label: "15min" },
+  { value: "60", label: "1小时" },
+  { value: "240", label: "4小时" },
+  { value: "1D", label: "1天" },
+  { value: "1W", label: "1周" },
+  { value: "1M", label: "1月" },
+];

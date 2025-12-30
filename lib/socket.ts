@@ -1,113 +1,88 @@
-import { ConnectionState } from "@/types/socket";
-// type EVENT_TYPE = "open" | "close" | "error";
+import { channelToSubscription } from "@/components/TVChartContainer/streaming";
+import { inflate } from "pako";
 
-class WebSocketManager {
-  private websocket: WebSocket | null = null;
-  private eventListeners: Map<string, Set<(data: ConnectionState) => void>> = new Map();
-  private retryCount = 0; // 当前重试次数
-  private maxRetries = 3; // 最大重试次数
-  private reconnectTimeout = 3000; // 重连间隔（毫秒）
-  private connectionState: ConnectionState = "disconnected";
+export const wsService = new WebSocket("wss://ws.coobit.cc/kline-api/ws");
 
-  constructor(private url: string) {}
+wsService.addEventListener("open", () => {
+  console.log("[socket] Connected");
+});
 
-  public connect() {
-    if (this.websocket) return;
-    this.updateConnectionState("connecting");
-    this.websocket = new WebSocket(this.url);
+wsService.addEventListener("close", (reason) => {
+  console.log("[socket] Disconnected:", reason);
+});
 
-    this.websocket.onopen = () => {
-      this.retryCount = 0; // 重置重试计数
-      this.updateConnectionState("connected");
-      this.dispatchEvent("open");
+wsService.addEventListener("error", (error) => {
+  console.log("[socket] Error:", error);
+});
+wsService.addEventListener("message", async (event) => {
+  const buffer = await event.data.arrayBuffer();
+  const uint8 = new Uint8Array(buffer);
+  const result = inflate(uint8, { to: "string" });
+  const data = JSON.parse(result);
+  console.log(data);
+  const {
+    // ds: tradeTime,
+    open: tradePrice,
+    vol: tradeVolume,
+    id: tradeTime,
+  } = data.data;
+
+  const channelString = data.channel;
+  const subscriptionItem = channelToSubscription.get(channelString);
+  if (subscriptionItem === undefined) {
+    return;
+  }
+  const defaultLastBar = {
+    time: Date.now(), // 当前时间
+    open: 0,
+    high: 0,
+    low: 0,
+    close: 0,
+    volume: 0,
+  };
+  const lastBar = subscriptionItem.lastBar || defaultLastBar;
+
+  // The resolution will be '1', '60', or '1D'
+  const nextBarTime = getNextBarTime(lastBar?.time, subscriptionItem.resolution);
+
+  let bar;
+  // If the trade time is greater than or equal to the next bar's start time, create a new bar
+  if (tradeTime * 1000 >= nextBarTime) {
+    bar = {
+      time: nextBarTime,
+      open: tradePrice,
+      high: tradePrice,
+      low: tradePrice,
+      close: tradePrice,
+      volume: tradeVolume,
     };
-    this.websocket.onclose = () => {
-      this.updateConnectionState("disconnected");
-      this.dispatchEvent("close");
-      this.websocket = null;
-      if (this.retryCount < this.maxRetries) {
-        this.retryCount++;
-        console.warn(`WebSocket closed. Attempting to reconnect... (${this.retryCount}/${this.maxRetries})`);
-        setTimeout(() => this.connect(), this.reconnectTimeout);
-      } else {
-        console.error("Max retries reached. Unable to reconnect.");
-        this.dispatchEvent("error", { message: "Max retries reached" });
-      }
+  } else {
+    // Otherwise, update the last bar
+    bar = {
+      ...lastBar,
+      high: Math.max(lastBar.high, tradePrice),
+      low: Math.min(lastBar.low, tradePrice),
+      close: tradePrice,
+      volume: (lastBar.volume || 0) + tradeVolume,
     };
-    this.websocket.onerror = (event) => {
-      this.updateConnectionState("disconnected");
-      this.dispatchEvent("error", event);
-    };
-    this.websocket.onmessage = (event) => this.handleMessage(event);
   }
+  subscriptionItem.lastBar = bar;
+  console.log(bar);
+  // Send data to every subscriber of that symbol
+  subscriptionItem.handlers.forEach((handler) => handler.callback(bar));
+});
 
-  public disconnect() {
-    if (this.websocket) {
-      this.websocket.close(1000, "Manual disconnect");
-      this.websocket = null;
-    }
-    this.retryCount = 0;
-    this.updateConnectionState("disconnected");
-  }
-  public getConnectionState() {
-    return this.connectionState;
-  }
+function getNextBarTime(barTime: string, resolution: string) {
+  const date = new Date(barTime);
+  const interval = parseInt(resolution);
 
-  private updateConnectionState(state: ConnectionState) {
-    this.connectionState = state;
-    this.dispatchEvent("stateChange", state);
+  if (resolution === "1D") {
+    date.setUTCDate(date.getUTCDate() + 1);
+    date.setUTCHours(0, 0, 0, 0);
+  } else if (!isNaN(interval)) {
+    // Handles '1' and '60' (minutes)
+    // Add the interval to the current bar's time
+    date.setUTCMinutes(date.getUTCMinutes() + interval);
   }
-  public sendMessage<T>(message: T) {
-    console.log("==========================");
-    if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-      this.websocket.send(JSON.stringify(message));
-    } else {
-      console.warn("WebSocket is not connected. Message not sent:", message);
-    }
-  }
-
-  public subscribe(eventType: string, listener: (data: ConnectionState) => void) {
-    if (!this.eventListeners.has(eventType)) {
-      this.eventListeners.set(eventType, new Set());
-    }
-    this.eventListeners.get(eventType)!.add(listener);
-  }
-
-  public unsubscribe(eventType: string, listener: (data: ConnectionState) => void) {
-    this.eventListeners.get(eventType)?.delete(listener);
-  }
-
-  private handleMessage(event: MessageEvent) {
-    try {
-      const message = JSON.parse(event?.data); // 假设 WebSocket 消息是 JSON 格式
-      if (message?.ping) {
-        this.sendMessage({ pong: 1 });
-        return;
-      }
-      const { type } = message;
-
-      if (type && this.eventListeners.has(type)) {
-        this.dispatchEvent(type, message);
-      }
-    } catch (error) {
-      console.log(error);
-      console.error("Failed to parse WebSocket message:", event.data);
-    }
-  }
-
-  private dispatchEvent(eventType: string, data?: ConnectionState | MessageEvent | Event | { message: string }) {
-    const listeners = this.eventListeners.get(eventType);
-    if (listeners) {
-      listeners.forEach((listener) => listener(data as ConnectionState));
-    }
-  }
+  return date.getTime();
 }
-
-let instance: WebSocketManager | null = null;
-
-export const getWebSocketManager = (url: string) => {
-  if (!instance) {
-    instance = new WebSocketManager(url);
-  }
-  return instance;
-};

@@ -1,28 +1,40 @@
-import { ChartingLibraryWidgetOptions, LanguageCode, ResolutionString, widget } from "@/public/charting_library";
-import { useEffect, useRef } from "react";
-import datafeed from "./datafeed";
+import { ChartingLibraryWidgetOptions, ResolutionString, widget } from "@/public/charting_library";
+import { useEffect, useRef, useState } from "react";
+import { DataFeed } from "./datafeed";
 
 export const TVChartContainer = (props: Partial<ChartingLibraryWidgetOptions>) => {
-  const chartContainerRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
-
+  const chartContainerRef = useRef<HTMLDivElement | null>(null);
+  const [datafeed, setDatafeed] = useState<DataFeed | null>(null);
+  // const { connectionState, sendMessage, subscribe, unsubscribe } = useWebSocketContext();
   useEffect(() => {
+    const newDatafeed = new DataFeed();
+    setDatafeed((prev) => {
+      if (prev) {
+        prev.destroy();
+      }
+      return newDatafeed;
+    });
+  }, []);
+  useEffect(() => {
+    if (!datafeed) return;
+    // if (!connectionState) return;
     const widgetOptions: ChartingLibraryWidgetOptions = {
       debug: true,
       symbol: props.symbol,
       // BEWARE: no trailing slash is expected in feed URL
       datafeed,
       interval: props.interval as ResolutionString,
-      container: chartContainerRef.current,
-      library_path: props.library_path,
-      locale: props.locale as LanguageCode,
+      container: chartContainerRef.current!,
+      library_path: "/charting_library/",
+      locale: "zh",
       disabled_features: ["use_localstorage_for_settings"],
       enabled_features: ["study_templates"],
-      charts_storage_url: props.charts_storage_url,
-      charts_storage_api_version: props.charts_storage_api_version,
-      client_id: props.client_id,
-      user_id: props.user_id,
-      fullscreen: props.fullscreen,
-      autosize: props.autosize,
+      // charts_storage_url: props.charts_storage_url,
+      // charts_storage_api_version: props.charts_storage_api_version,
+      // client_id: props.client_id,
+      // user_id: props.user_id,
+      fullscreen: false,
+      autosize: true,
     };
 
     const tvWidget = new widget(widgetOptions);
@@ -48,7 +60,7 @@ export const TVChartContainer = (props: Partial<ChartingLibraryWidgetOptions>) =
     return () => {
       tvWidget.remove();
     };
-  }, [props]);
+  }, [datafeed, props]);
 
   return <div ref={chartContainerRef} className="h-full" />;
 };

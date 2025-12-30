@@ -1,7 +1,6 @@
 "use client";
-import { getWebSocketManager } from "@/lib/socket";
-import { ConnectionState } from "@/types/socket";
-import React, { createContext, useEffect, useState } from "react";
+// import { getWebSocketManager } from "@/lib/socket";
+import React, { createContext, useContext } from "react";
 
 type WebSocketContextType = {
   sendMessage: (data: unknown) => void;
@@ -12,63 +11,23 @@ type WebSocketContextType = {
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
-export const WebSocketProvider = ({ url, children }: { url: string; children: React.ReactNode }) => {
-  const webSocketManager = getWebSocketManager(url);
+export const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
+  // const webSocketManager = getWebSocketManager();
 
-  const [connectionState, setConnectionState] = useState<ConnectionState>(webSocketManager.getConnectionState());
+  // const [connectionState, setConnectionState] = useState<ConnectionState>(webSocketManager.getConnectionState());
 
-  useEffect(() => {
-    console.log(connectionState);
-    if (connectionState === "connected") {
-      console.log("可以发送消息了");
-      webSocketManager.sendMessage({
-        op: "subscribe",
-        args: [
-          {
-            ccy: "BTC",
-            channel: "cup-tickers-3s",
-          },
-          {
-            ccy: "ETH",
-            channel: "cup-tickers-3s",
-          },
-          {
-            ccy: "OKB",
-            channel: "cup-tickers-3s",
-          },
-          {
-            ccy: "SOL",
-            channel: "cup-tickers-3s",
-          },
-          {
-            ccy: "TON",
-            channel: "cup-tickers-3s",
-          },
-          {
-            ccy: "DOGE",
-            channel: "cup-tickers-3s",
-          },
-          {
-            ccy: "XRP",
-            channel: "cup-tickers-3s",
-          },
-        ],
-      });
-    }
-  }, [connectionState, webSocketManager]);
+  // useEffect(() => {
+  //   const handleStateChange = (state: ConnectionState) => {
+  //     setConnectionState(state);
+  //   };
+  //   // webSocketManager.subscribe("stateChange", handleStateChange);
+  //   // webSocketManager.connect();
 
-  useEffect(() => {
-    const handleStateChange = (state: ConnectionState) => {
-      setConnectionState(state);
-    };
-    webSocketManager.subscribe("stateChange", handleStateChange);
-    webSocketManager.connect();
-
-    return () => {
-      webSocketManager.unsubscribe("stateChange", handleStateChange);
-      webSocketManager.disconnect();
-    };
-  }, [webSocketManager]);
+  //   return () => {
+  //     webSocketManager.unsubscribe("stateChange", handleStateChange);
+  //     webSocketManager.disconnect();
+  //   };
+  // }, [webSocketManager]);
 
   return (
     <WebSocketContext.Provider
@@ -82,4 +41,12 @@ export const WebSocketProvider = ({ url, children }: { url: string; children: Re
       {children}
     </WebSocketContext.Provider>
   );
+};
+
+export const useWebSocketContext = () => {
+  const context = useContext(WebSocketContext);
+  if (!context) {
+    throw new Error("useWebSocketContext must be used within a WebSocketProvider");
+  }
+  return context;
 };
