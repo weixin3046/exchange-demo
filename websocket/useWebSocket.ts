@@ -9,7 +9,7 @@ interface UseWebSocketOptions {
 export function useWebSocket(options: UseWebSocketOptions = {}) {
   const { url, autoConnect = true } = options;
   const [isConnected, setIsConnected] = useState(false);
-  const [lastMessage, setLastMessage] = useState<any>(null);
+  // const [lastMessage, setLastMessage] = useState<T>(null);
   const wsManagerRef = useRef<WebSocketManager | null>(null);
 
   // 初始化WebSocket管理器
@@ -66,7 +66,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const subscribe = useCallback((channel: string, params: Record<string, any> = {}, callback: (data: any) => void) => {
     if (wsManagerRef.current) {
       wsManagerRef.current.subscribe(channel, params, (data) => {
-        setLastMessage(data);
+        // setLastMessage(data);
         callback(data);
       });
     }
@@ -111,7 +111,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   return {
     isConnected,
-    lastMessage,
+    // lastMessage,
     connect,
     disconnect,
     subscribe,

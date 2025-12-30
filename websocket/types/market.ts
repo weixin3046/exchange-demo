@@ -42,3 +42,31 @@ export interface TradeData {
 export interface TradeTickData {
   data: TradeData[];
 }
+
+export interface MarketTicker {
+  vol: string;
+  rose: string;
+  open: string;
+  low: string;
+  high: string;
+  close: string;
+  amount: string;
+  bidPrice: string;
+  bidVolume: string;
+  askPrice: string;
+  askVolume: string;
+}
+
+export interface KlineData {
+  amount: number;
+  close: number;
+  ds: string;
+  high: number;
+  low: number;
+  open: number;
+  vol: number;
+  id: number;
+}
+export interface TradeTickData {
+  data: TradeData[];
+}

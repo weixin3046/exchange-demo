@@ -21,7 +21,9 @@ const eslintConfig = [
   },
   // 自定义 ESLint 规则
   {
-    rules: {},
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
   },
 ];
 

@@ -7,10 +7,17 @@ interface WebSocketConfig {
   heartbeatInterval?: number;
 }
 
+interface WebSocketMessage {
+  channel: string;
+  data?: any;
+  raw?: any;
+  timestamp?: number;
+}
+
 interface Subscription {
   channel: string;
-  params?: Record<string, any>;
-  callback: (data: any) => void;
+  params?: Record<string, string>;
+  callback: (data: WebSocketMessage) => void;
 }
 
 class WebSocketManager {
@@ -99,7 +106,7 @@ class WebSocketManager {
   }
 
   // 订阅频道
-  subscribe(channel: string, params: Record<string, any> = {}, callback: (data: any) => void): void {
+  subscribe(channel: string, params: Record<string, string> = {}, callback: (data: WebSocketMessage) => void): void {
     // 存储订阅信息，使用channel作为key
     this.subscriptions.set(channel, {
       channel,
@@ -152,7 +159,7 @@ class WebSocketManager {
   }
 
   // 发送订阅消息
-  private sendSubscription(channel: string, params: Record<string, any>): void {
+  private sendSubscription(channel: string, params: Record<string, string>): void {
     const subscriptionMsg = {
       event: "sub",
       params: {
@@ -160,6 +167,7 @@ class WebSocketManager {
         ...params,
       },
     };
+
     this.ws?.send(JSON.stringify(subscriptionMsg));
   }
 
@@ -168,6 +176,8 @@ class WebSocketManager {
     try {
       const parsedData = JSON.parse(data);
       const { channel, tick, data: tickData } = parsedData;
+
+      if (!channel) return;
 
       // 根据channel查找对应的订阅
       const subscription = this.subscriptions.get(channel);
