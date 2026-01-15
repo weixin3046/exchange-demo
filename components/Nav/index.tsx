@@ -12,12 +12,12 @@ export default function Nav() {
     <nav>
       <NavigationMenu>
         <NavigationMenuList>
-          <NavigationMenuItem>
+          <NavigationMenuItem asChild>
             <Link href="/trade-spot">
               <NavigationMenuLink>{t("spot")}</NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
-          <NavigationMenuItem>
+          <NavigationMenuItem asChild>
             <Link href="/trade-swap">
               <NavigationMenuLink>{t("swap")}</NavigationMenuLink>
             </Link>
