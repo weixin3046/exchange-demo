@@ -136,6 +136,7 @@ class TVDataFeed implements IDatafeedChartApi {
     if (!sub) return;
     this.socketManager.unsubscribe(sub.channel, sub.cbId);
     this.subscriptionMap.delete(listenerGuid);
+    this.lastBarTimeMap.clear();
   }
 
   // --- 辅助方法（数据格式转换，不变） ---
