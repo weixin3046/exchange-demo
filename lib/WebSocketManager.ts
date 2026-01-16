@@ -1,28 +1,34 @@
-// 定义：发送给服务器的消息接口
+import { KlineData } from "@/datafeed";
 import { inflate } from "pako";
 
+interface SubscriptionParams {
+  channel: string;
+  cb_id?: string;
+  endIdx?: number;
+  pageSize?: number;
+  top?: number;
+  priceChangeType?: string;
+  klineZone?: string;
+}
 interface SubscriptionMessage {
   event: "sub" | "unsub" | "req";
-  params: {
-    channel: string;
-    cb_id: string;
-  };
+  params: SubscriptionParams;
 }
 
-interface ServerResponse<T> {
-  event_rep?: string;
-  channel?: string;
-  data?: T;
-  tick?: T;
-  // ... 其他可能的字段
-}
+// interface ServerResponse<T> {
+//   event_rep: string;
+//   channel: string;
+//   ping?: string;
+//   data?: T;
+//   tick?: T;
+// }
 
 export class SocketManager {
   private socket: WebSocket | null = null;
   private readonly url: string;
-  private historyListeners: Map<string, Set<(data: any) => void>> = new Map();
-  private realtimeListeners: Map<string, Set<(data: any) => void>> = new Map();
-
+  private historyListeners: Map<string, (data: KlineData[]) => void> = new Map();
+  private realtimeListeners: Map<string, (data: KlineData) => void> = new Map();
+  private pendingMessages: SubscriptionMessage[] = [];
   constructor(url: string) {
     this.url = url;
     this.connect();
@@ -38,6 +44,14 @@ export class SocketManager {
 
     this.socket.onopen = () => {
       console.log("WebSocket 已连接。");
+      // 🔥 连接成功后，发送所有待发送消息
+      this.pendingMessages.forEach((msg) => {
+        console.log("补发消息:", msg);
+        this.socket?.send(JSON.stringify(msg));
+      });
+
+      // 清空队列
+      this.pendingMessages = [];
     };
 
     this.socket.onmessage = async (event) => {
@@ -68,23 +82,34 @@ export class SocketManager {
       console.log("发送消息:", message);
       this.socket.send(JSON.stringify(message));
     } else {
-      console.error("WebSocket 未连接，无法发送消息。");
+      console.log("Socket 未连接，消息进入队列:", message);
+      this.pendingMessages.push(message);
     }
   }
 
   private handleMessage(jsonData: string): void {
     try {
-      const response: ServerResponse<any> = JSON.parse(jsonData);
-      if (response.event_rep === "rep") {
-        // TODO: 这里没有返回cb_id
+      const response = JSON.parse(jsonData);
+      const channel = response.channel;
+      if (response.ping) {
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+          this.socket.send(
+            JSON.stringify({
+              pong: 1,
+            })
+          );
+        }
+        return;
       }
-      const channelId = response.ch || response.rep;
-
-      if (channelId) {
-        if (response.rep && this.historyListeners.has(channelId)) {
-          this.historyListeners.get(channelId)?.forEach((listener) => listener(response.data));
-        } else if (response.ch && this.realtimeListeners.has(channelId)) {
-          this.realtimeListeners.get(channelId)?.forEach((listener) => listener(response.data));
+      if (response.event_rep === "rep") {
+        const listener = this.historyListeners.get(channel);
+        if (listener) {
+          listener(response.data);
+        }
+      } else {
+        const listener = this.realtimeListeners.get(channel);
+        if (listener) {
+          listener(response.tick);
         }
       }
     } catch (error) {
@@ -94,20 +119,16 @@ export class SocketManager {
 
   // --- 对外暴露的方法 ---
 
-  public subscribeToHistory(channel: string, cbId: string, listener: (data: any) => void): void {
-    if (!this.historyListeners.has(channel)) this.historyListeners.set(channel, new Set());
-    this.historyListeners.get(channel)?.add(listener);
-
+  public subscribeToHistory(channel: string, params: SubscriptionParams, listener: (data: KlineData[]) => void): void {
+    this.historyListeners.set(channel, listener);
     this.send({
       event: "req",
-      params: { channel, cb_id: cbId },
+      params,
     });
   }
 
-  public subscribeToRealtime(channel: string, cbId: string, listener: (data: any) => void): void {
-    if (!this.realtimeListeners.has(channel)) this.realtimeListeners.set(channel, new Set());
-    this.realtimeListeners.get(channel)?.add(listener);
-
+  public subscribeToRealtime(channel: string, cbId: string, listener: (data: KlineData) => void): void {
+    this.realtimeListeners.set(channel, listener);
     this.send({
       event: "sub",
       params: { channel, cb_id: cbId },
@@ -122,6 +143,7 @@ export class SocketManager {
     });
     // 可选：清除本地监听器，或交由 TVDataFeed 管理
     this.realtimeListeners.delete(channel);
+    this.historyListeners.delete(channel);
   }
 
   public close(): void {
@@ -129,7 +151,6 @@ export class SocketManager {
   }
 }
 
-// const SocketManagerClient = new SocketManager("wss://ws.coobit.cc/kline-api/ws");
 const SOCKET_URL = "wss://ws.coobit.cc/kline-api/ws";
 const socketManagerInstance = new SocketManager(SOCKET_URL);
 export default socketManagerInstance;

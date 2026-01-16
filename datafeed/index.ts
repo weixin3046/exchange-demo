@@ -11,13 +11,30 @@ import {
   ResolveCallback,
   SubscribeBarsCallback,
 } from "@/public/charting_library";
+export interface KlineData {
+  id: number; // 时间戳（秒）
+  open: number; // 开盘价
+  high: number; // 最高价
+  low: number; // 最低价
+  close: number; // 收盘价
+  vol: number; // 成交量
+  amount: number; // 成交额
+  ds: string;
+}
+export interface TVKlineBar {
+  time: number; // 时间戳（毫秒）
+  open: number; // 开盘价
+  high: number; // 最高价
+  low: number; // 最低价
+  close: number; // 收盘价
+  volume: number; // 成交量
+}
 
 class TVDataFeed implements IDatafeedChartApi {
   // 接收外部传入的 SocketManager 实例
   private socketManager: SocketManager;
-  private subscribers: Map<string, SubscribeBarsCallback> = new Map();
-  private activeSubscriptions: Map<string, { channelName: string; cbId: string }> = new Map();
-
+  private lastBarTimeMap = new Map<string, number>();
+  private subscriptionMap = new Map<string, { channel: string; cbId: string }>();
   // 构造函数现在接收一个已准备好的 SocketManager
   constructor(manager: SocketManager) {
     this.socketManager = manager;
@@ -41,11 +58,7 @@ class TVDataFeed implements IDatafeedChartApi {
     );
   }
 
-  public resolveSymbol(
-    symbolName: string,
-    onSymbolResolvedCallback: ResolveCallback,
-    onErrorCallback: (reason: string) => void
-  ): void {
+  public resolveSymbol(symbolName: string, onSymbolResolvedCallback: ResolveCallback): void {
     // ... （商品信息解析逻辑不变）
     const symbolInfo: LibrarySymbolInfo = {
       //  unit_id: visualMultiplier.toString(),
@@ -58,7 +71,7 @@ class TVDataFeed implements IDatafeedChartApi {
       timezone: "Etc/UTC",
       has_intraday: true,
       has_daily: true,
-      currency_code: "USD",
+      // currency_code: "USDT",
       data_status: "streaming",
       visible_plots_set: "ohlc",
       exchange: "GMX",
@@ -73,18 +86,26 @@ class TVDataFeed implements IDatafeedChartApi {
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,
     periodParams: PeriodParams,
-    onHistoryCallback: HistoryCallback,
-    onErrorCallback: (reason: string) => void
+    onHistoryCallback: HistoryCallback
   ): void {
-    // ... （调用 socketManager.subscribeToHistory）
-    const channelName = `market_${symbolInfo.ticker!.toLowerCase()}_kline_1min`;
-    const cbId = `history_${channelName}_${periodParams.from}_${periodParams.to}`;
-    this.socketManager.subscribeToHistory(channelName, cbId, (data) => {
-      console.log(data);
+    const { firstDataRequest } = periodParams;
+    const klineResolution = SUPPORTED_RESOLUTIONS[resolution];
+    const channel = this.getKlineChannel(symbolInfo.name, klineResolution);
+    const lastTime = this.lastBarTimeMap.get(channel);
+    const params = {
+      channel,
+      cb_id: symbolInfo.name,
+      ...(!firstDataRequest && {
+        endIdx: lastTime,
+        pageSize: 50,
+      }),
+    };
+    this.socketManager.subscribeToHistory(channel, params, (data) => {
       const bars = this.formatBars(data);
       if (bars.length === 0) {
         onHistoryCallback([], { noData: true });
       } else {
+        this.lastBarTimeMap.set(channel, bars[0].time / 1000);
         onHistoryCallback(bars, { noData: false });
       }
     });
@@ -94,39 +115,57 @@ class TVDataFeed implements IDatafeedChartApi {
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,
     onTick: SubscribeBarsCallback,
-    listenerGuid: string,
-    onResetCacheNeededCallback: () => void
+    listenerGuid: string
   ): void {
-    console.log(222);
-    // ... （调用 socketManager.subscribeToRealtime）
-    const channelName = `market_${symbolInfo.ticker!.toLowerCase()}_kline_${resolution}`;
-    const cbId = `${channelName}_${listenerGuid}`;
+    const klineResolution = SUPPORTED_RESOLUTIONS[resolution];
+    const channel = this.getKlineChannel(symbolInfo.name, klineResolution);
 
-    this.subscribers.set(listenerGuid, onTick);
-    this.activeSubscriptions.set(listenerGuid, { channelName, cbId });
+    this.subscriptionMap.set(listenerGuid, {
+      channel,
+      cbId: symbolInfo.name,
+    });
 
-    this.socketManager.subscribeToRealtime(channelName, cbId, (data) => {
+    this.socketManager.subscribeToRealtime(channel, symbolInfo.name, (data) => {
       const newBar = this.formatSingleBar(data);
       onTick(newBar);
     });
   }
 
   public unsubscribeBars(listenerGuid: string): void {
-    // ... （调用 socketManager.unsubscribe）
-    const subscription = this.activeSubscriptions.get(listenerGuid);
-    if (subscription) {
-      this.socketManager.unsubscribe(subscription.channelName, subscription.cbId);
-      this.subscribers.delete(listenerGuid);
-      this.activeSubscriptions.delete(listenerGuid);
-    }
+    const sub = this.subscriptionMap.get(listenerGuid);
+    if (!sub) return;
+    this.socketManager.unsubscribe(sub.channel, sub.cbId);
+    this.subscriptionMap.delete(listenerGuid);
   }
 
   // --- 辅助方法（数据格式转换，不变） ---
-  private formatBars(dataArray: any[]): any[] {
-    /* ... */ return [];
+  private formatBars(dataArray: KlineData[]) {
+    const bars: TVKlineBar[] = [];
+    dataArray.forEach((bar) => {
+      bars.push({
+        time: bar.id * 1000,
+        low: bar.low,
+        high: bar.high,
+        open: bar.open,
+        close: bar.close,
+        volume: bar.vol || 0,
+      });
+    });
+    return bars;
   }
-  private formatSingleBar(item: any): any {
-    /* ... */ return {};
+  private formatSingleBar(item: KlineData) {
+    return {
+      time: item.id * 1000,
+      open: item.open,
+      high: item.high,
+      low: item.low,
+      close: item.close,
+      volume: item.vol || 0,
+    };
+  }
+
+  private getKlineChannel(symbol: string, resolution: string) {
+    return `market_${symbol}_kline_${resolution}`;
   }
   public searchSymbols(): void {}
 }
