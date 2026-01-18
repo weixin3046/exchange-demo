@@ -143,14 +143,7 @@ class TVDataFeed implements IDatafeedChartApi {
   private formatBars(dataArray: KlineData[]) {
     const bars: TVKlineBar[] = [];
     dataArray.forEach((bar) => {
-      bars.push({
-        time: bar.id * 1000,
-        low: bar.low,
-        high: bar.high,
-        open: bar.open,
-        close: bar.close,
-        volume: bar.vol || 0,
-      });
+      bars.push(this.formatSingleBar(bar));
     });
     return bars;
   }
