@@ -7,6 +7,7 @@ import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 const geistSans = Geist({
@@ -32,6 +33,8 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   // Ensure that the incoming `locale` is valid
+  const headersObj = await headers();
+  const cookies = headersObj.get("cookie");
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
@@ -43,7 +46,7 @@ export default async function LocaleLayout({
         <ThemeProvider>
           <NextIntlClientProvider>
             <WebSocketProvider url="wss://wspri.okx.com:8443/ws/v5/ipublic">
-              <Web3Provider>
+              <Web3Provider cookies={cookies}>
                 <Header />
                 {children}
               </Web3Provider>
