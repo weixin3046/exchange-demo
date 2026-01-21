@@ -56,30 +56,35 @@
 }
 
 @theme {
-  /* Based.one Exact Color Scheme */
   --color-red-text: #f6465d;
   --color-red-bg: rgba(246, 70, 93, 0.1);
   --color-green-text: #0ecb81;
   --color-green-bg: rgba(14, 203, 129, 0.1);
 
-  /* Background colors matching based.one */
-  --color-header-bg: #111111;
-  --color-main-bg: #202020;
-  --color-panel-bg: #1a1a1a;
-  --color-card-bg: #252525;
+  --based-orange: #ff6940;
+  --based-orange-hover: #ff5733;
+  --based-orange-light: rgba(255, 105, 64, 0.1);
+  --based-orange-dark: #e55a2b;
+
+  --color-header-bg: #000000;
+  --color-main-bg: #000000;
+  --color-panel-bg: #111111;
+  --color-card-bg: #1a1a1a;
   --color-border-light: rgba(255, 255, 255, 0.1);
   --color-border-medium: rgba(255, 255, 255, 0.15);
 
-  /* RGB values for opacity calculations */
   --color-red-text-rgb: 246, 70, 93;
   --color-red-bg-rgb: 246, 70, 93;
   --color-green-text-rgb: 14, 203, 129;
   --color-green-bg-rgb: 14, 203, 129;
+  --based-orange-rgb: 255, 105, 64;
 
-  /* Text colors */
   --color-text-primary: #ffffff;
   --color-text-secondary: #9ca3af;
   --color-text-muted: #6b7280;
+
+  --primary: var(--based-orange);
+  --primary-foreground: oklch(0.985 0 0);
 }
 
 :root {
@@ -173,5 +178,27 @@
   }
   &::-webkit-scrollbar-thumb:hover {
     @apply bg-white/20;
+  }
+}
+
+@layer utilities {
+  .animate-scroll {
+    animation: scroll 2s ease-in-out infinite;
+  }
+
+  .animate-ping-slow {
+    animation: ping 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+}
+
+@keyframes scroll {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 0.5;
   }
 }

@@ -58,8 +58,10 @@ export const WebSocketProvider = ({ url, children }: { url: string; children: Re
   }, [connectionState, webSocketManager]);
 
   useEffect(() => {
-    const handleStateChange = (state: ConnectionState) => {
-      setConnectionState(state);
+    const handleStateChange = (data: unknown) => {
+      if (typeof data === "string" && ["disconnected", "connecting", "connected"].includes(data)) {
+        setConnectionState(data as ConnectionState);
+      }
     };
     webSocketManager.subscribe("stateChange", handleStateChange);
     webSocketManager.connect();
