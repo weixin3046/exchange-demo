@@ -1,15 +1,44 @@
 {
-    "Nav": {
-        "home": "HomePage",
-        "spot": "Spot",
-        "swap": "Futures"
+  "Nav": {
+    "home": "Home",
+    "spot": "Spot",
+    "swap": "Futures",
+    "about": "About"
+  },
+  "HomePage": {
+    "title": "Hello world!",
+    "about": "Go to the about page",
+    "Hero": {
+      "title": "The Future of \nCrypto Trading",
+      "subtitle": "Experience professional-grade execution, deep liquidity, and zero latency on the world's most advanced exchange.",
+      "startTrading": "Start Trading",
+      "viewMarkets": "View Markets",
+      "trending": "Trending Markets"
     },
-    "HomePage": {
-        "title": "Hello world!",
-        "about": "Go to the about page"
+    "Features": {
+      "title": "Why Choose Us",
+      "fastExecution": "Lightning Fast",
+      "fastExecutionDesc": "Order execution in microseconds with our advanced matching engine.",
+      "security": "Bank-Grade Security",
+      "securityDesc": "Your funds are protected by industry-leading encryption and cold storage.",
+      "liquidity": "Deep Liquidity",
+      "liquidityDesc": "Trade with minimal slippage even on large orders.",
+      "support": "24/7 Support",
+      "supportDesc": "Our dedicated team is always here to help you around the clock."
     },
-    "AboutPage": {
-        "title": "About Page!",
-        "content": "This is a page about"
+    "Stats": {
+      "volume": "24h Volume",
+      "users": "Registered Users",
+      "countries": "Countries Supported"
+    },
+    "CTA": {
+      "title": "Ready to Start Trading?",
+      "subtitle": "Join thousands of traders and experience the next generation of crypto exchange.",
+      "button": "Connect Wallet"
     }
+  },
+  "AboutPage": {
+    "title": "About Page!",
+    "content": "This is a page about"
+  }
 }

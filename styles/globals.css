@@ -56,14 +56,30 @@
 }
 
 @theme {
-  --color-red-text: #ca3f64;
-  --color-red-bg: #ca3f64;
-  --color-green-text: #25a750;
-  --color-green-bg: #25a750;
-  /* --color-red-text-rgb: 202, 63, 100;
-  --color-red-bg-rgb: 202, 63, 100;
-  --color-green-text-rgb: 37, 167, 80;
-  --color-green-bg-rgb: 37, 167, 80; */
+  /* Based.one Exact Color Scheme */
+  --color-red-text: #f6465d;
+  --color-red-bg: rgba(246, 70, 93, 0.1);
+  --color-green-text: #0ecb81;
+  --color-green-bg: rgba(14, 203, 129, 0.1);
+
+  /* Background colors matching based.one */
+  --color-header-bg: #111111;
+  --color-main-bg: #202020;
+  --color-panel-bg: #1a1a1a;
+  --color-card-bg: #252525;
+  --color-border-light: rgba(255, 255, 255, 0.1);
+  --color-border-medium: rgba(255, 255, 255, 0.15);
+
+  /* RGB values for opacity calculations */
+  --color-red-text-rgb: 246, 70, 93;
+  --color-red-bg-rgb: 246, 70, 93;
+  --color-green-text-rgb: 14, 203, 129;
+  --color-green-bg-rgb: 14, 203, 129;
+
+  /* Text colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #9ca3af;
+  --color-text-muted: #6b7280;
 }
 
 :root {
@@ -141,5 +157,21 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@utility custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    @apply rounded bg-white/10;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/20;
   }
 }

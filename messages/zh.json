@@ -1,15 +1,44 @@
 {
-    "Nav": {
-        "home": "首页",
-        "spot": "现货",
-        "swap": "合约"
+  "Nav": {
+    "home": "首页",
+    "spot": "现货",
+    "swap": "合约",
+    "about": "关于"
+  },
+  "HomePage": {
+    "title": "你好，世界！",
+    "about": "去往About页面",
+    "Hero": {
+      "title": "加密交易的\n未来已来",
+      "subtitle": "在全球最先进的交易所体验专业级执行、深度流动性和零延迟交易。",
+      "startTrading": "开始交易",
+      "viewMarkets": "查看市场",
+      "trending": "热门市场"
     },
-    "HomePage": {
-        "title": "你好，世界！",
-        "about": "去往About页面"
+    "Features": {
+      "title": "为什么选择我们",
+      "fastExecution": "极速执行",
+      "fastExecutionDesc": "先进的撮合引擎实现微秒级订单执行。",
+      "security": "银行级安全",
+      "securityDesc": "行业领先的加密技术和冷存储保护您的资金安全。",
+      "liquidity": "深度流动性",
+      "liquidityDesc": "即使是大额订单也能以最小滑点成交。",
+      "support": "24/7 支持",
+      "supportDesc": "我们的专业团队全天候为您提供帮助。"
     },
-    "AboutPage": {
-        "title": "关于页面！",
-        "content": "这是一个关于页面"
+    "Stats": {
+      "volume": "24小时交易量",
+      "users": "注册用户",
+      "countries": "支持国家/地区"
+    },
+    "CTA": {
+      "title": "准备好开始交易了吗？",
+      "subtitle": "加入数千名交易者的行列，体验下一代加密货币交易所。",
+      "button": "连接钱包"
     }
+  },
+  "AboutPage": {
+    "title": "关于页面！",
+    "content": "这是一个关于页面"
+  }
 }
