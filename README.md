@@ -51,19 +51,15 @@ yarn dev
 
 ### 🔑 认证功能
 
-项目支持两种认证方式：
+项目采用现代化的 Web3 钱包连接认证：
 
 #### 钱包连接 (Reown AppKit)
 
-- 支持 MetaMask, WalletConnect, Coinbase Wallet 等
+- 支持 MetaMask, WalletConnect, Coinbase Wallet, Rainbow 等主流钱包
 - 自动检测已安装的钱包
 - 显示连接状态和钱包地址
-
-#### 邮箱密码认证
-
-- 传统的用户名/邮箱 + 密码登录
-- 支持注册新账户
-- 社交登录集成 (Google, Twitter)
+- 安全的消息签名认证
+- 一键连接，无需注册
 
 ### 采用了 src 目录
 
