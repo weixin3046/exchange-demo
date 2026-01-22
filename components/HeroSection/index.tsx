@@ -1,9 +1,35 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 export default function HeroSection() {
+  const { ref: badgeRef, isIntersecting: badgeVisible } = useIntersectionObserver<HTMLDivElement>({
+    threshold: 0.3,
+    triggerOnce: true,
+  });
+
+  const { ref: titleRef, isIntersecting: titleVisible } = useIntersectionObserver<HTMLHeadingElement>({
+    threshold: 0.3,
+    triggerOnce: true,
+  });
+
+  const { ref: subtitleRef, isIntersecting: subtitleVisible } = useIntersectionObserver<HTMLParagraphElement>({
+    threshold: 0.3,
+    triggerOnce: true,
+  });
+
+  const { ref: descriptionRef, isIntersecting: descriptionVisible } = useIntersectionObserver<HTMLParagraphElement>({
+    threshold: 0.3,
+    triggerOnce: true,
+  });
+
+  const { ref: buttonsRef, isIntersecting: buttonsVisible } = useIntersectionObserver<HTMLDivElement>({
+    threshold: 0.3,
+    triggerOnce: true,
+  });
+
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
       <div className="absolute inset-0 z-0">
@@ -14,24 +40,49 @@ export default function HeroSection() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        <div className="bg-based-orange/10 border-based-orange/20 mb-8 inline-flex items-center gap-2 rounded-full border px-4 py-2">
+        <div
+          ref={badgeRef}
+          className={`bg-based-orange/10 border-based-orange/20 mb-8 inline-flex items-center gap-2 rounded-full border px-4 py-2 transition-all duration-1000 ease-out ${
+            badgeVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
+        >
           <Sparkles className="text-based-orange h-4 w-4" />
           <span className="text-based-orange text-sm font-medium tracking-wide">THE FUTURE IS</span>
         </div>
 
-        <h1 className="mb-6 text-5xl leading-tight font-bold tracking-tight text-white sm:text-6xl lg:text-7xl xl:text-8xl">
+        <h1
+          ref={titleRef}
+          className={`mb-6 text-5xl leading-tight font-bold tracking-tight text-white transition-all duration-1000 ease-out sm:text-6xl lg:text-7xl xl:text-8xl ${
+            titleVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
+        >
           <span className="block">Based</span>
         </h1>
 
-        <p className="mx-auto mb-12 max-w-2xl text-xl leading-relaxed text-gray-300 sm:text-2xl lg:text-3xl">
+        <p
+          ref={subtitleRef}
+          className={`mx-auto mb-12 max-w-2xl text-xl leading-relaxed text-gray-300 transition-all delay-200 duration-1000 ease-out sm:text-2xl lg:text-3xl ${
+            subtitleVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
+        >
           Trade everything, spend everywhere
         </p>
 
-        <p className="mx-auto mb-12 max-w-3xl text-lg leading-relaxed text-gray-400">
+        <p
+          ref={descriptionRef}
+          className={`mx-auto mb-12 max-w-3xl text-lg leading-relaxed text-gray-400 transition-all delay-300 duration-1000 ease-out ${
+            descriptionVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
+        >
           Your everyday advantage in every market. The future is Based.
         </p>
 
-        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <div
+          ref={buttonsRef}
+          className={`flex flex-col items-center justify-center gap-4 transition-all delay-500 duration-1000 ease-out sm:flex-row ${
+            buttonsVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+          }`}
+        >
           <Button
             variant="default"
             size="lg"
