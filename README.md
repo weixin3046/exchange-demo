@@ -2,6 +2,69 @@
 
 https://exchange-demo-eight.vercel.app/
 
+### 🚀 快速开始
+
+#### 1. 环境变量设置
+
+复制环境变量文件并配置：
+
+```bash
+cp .env.example .env.local
+```
+
+编辑 `.env.local` 文件，设置以下变量：
+
+```env
+# Reown AppKit 配置 (必需)
+# 从 https://cloud.reown.com/ 获取项目ID
+NEXT_PUBLIC_PROJECT_ID=your_project_id_here
+
+# NextAuth.js 配置 (可选，用于邮箱认证)
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_secret_here
+
+# 社交登录配置 (可选)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+#### 2. Reown AppKit 设置
+
+1. 访问 [Reown Cloud](https://cloud.reown.com/)
+2. 创建新项目或使用现有项目
+3. 复制项目ID到环境变量
+4. 配置允许的域名（开发环境：`http://localhost:3000`）
+
+#### 3. 安装依赖
+
+```bash
+yarn install
+```
+
+#### 4. 启动开发服务器
+
+```bash
+yarn dev
+```
+
+访问 http://localhost:3000 查看应用。
+
+### 🔑 认证功能
+
+项目支持两种认证方式：
+
+#### 钱包连接 (Reown AppKit)
+
+- 支持 MetaMask, WalletConnect, Coinbase Wallet 等
+- 自动检测已安装的钱包
+- 显示连接状态和钱包地址
+
+#### 邮箱密码认证
+
+- 传统的用户名/邮箱 + 密码登录
+- 支持注册新账户
+- 社交登录集成 (Google, Twitter)
+
 ### 采用了 src 目录
 
 ```
