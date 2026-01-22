@@ -20,11 +20,13 @@ export default function Navbar() {
 
   const navigation = [
     { name: "Home", href: "/" },
+    { name: "Trading", href: "/trading" },
     { name: "Trade", href: "/#trade" },
     { name: "Predict", href: "/#predict" },
     { name: "Cards", href: "/#cards" },
     { name: "Affiliate", href: "/#affiliate" },
     { name: "Resources", href: "/#resources" },
+    { name: "Login", href: "/auth" },
   ];
 
   const toggleMenu = () => {
