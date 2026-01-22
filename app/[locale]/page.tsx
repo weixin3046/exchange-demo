@@ -7,6 +7,7 @@ import {
 } from "@/components/DynamicImports";
 import Navbar from "@/components/Navbar";
 import { DevPerformanceWrapper } from "@/components/PerformanceDashboard";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
         <DynamicStatsSection />
         <DynamicFeaturesSection />
         <DynamicFooter />
+        <ScrollToTop />
       </div>
     </DevPerformanceWrapper>
   );

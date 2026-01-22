@@ -8,10 +8,19 @@ import { useEffect, useState } from "react";
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+
+      setScrolled(scrollTop > 10);
+
+      // 检测是否滚动到底部（距离底部100px内）
+      const isNearBottom = scrollTop + windowHeight >= docHeight - 100;
+      setIsAtBottom(isNearBottom);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -37,18 +46,27 @@ export default function Navbar() {
     <>
       <nav
         className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "border-b border-white/10 bg-black/90 shadow-lg backdrop-blur-md"
-            : "border-b border-transparent bg-black/0 backdrop-blur-none"
+          isAtBottom
+            ? "border-based-orange/50 border-b-2 bg-black/95 shadow-2xl backdrop-blur-lg"
+            : scrolled
+              ? "border-b border-white/10 bg-black/90 shadow-lg backdrop-blur-md"
+              : "border-b border-transparent bg-black/0 backdrop-blur-none"
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative h-16">
             <div className="absolute top-1/2 left-0 flex-shrink-0 -translate-y-1/2">
               <Link href="/" className="group flex items-center transition-transform duration-300 hover:scale-105">
-                <span className="group-hover:text-based-orange text-2xl font-bold text-white transition-all duration-300">
+                <span
+                  className={`text-2xl font-bold text-white transition-all duration-500 ${
+                    isAtBottom ? "text-based-orange scale-110 drop-shadow-lg" : "group-hover:text-based-orange"
+                  }`}
+                >
                   Based
                 </span>
+                {isAtBottom && (
+                  <div className="bg-based-orange/20 absolute -inset-2 animate-pulse rounded-lg blur-lg" />
+                )}
               </Link>
             </div>
 
@@ -120,13 +138,22 @@ export default function Navbar() {
               </div>
 
               <Button
-                variant="default"
-                className="group relative overflow-hidden rounded-full bg-white px-6 py-2 text-sm font-medium text-black shadow-md transition-all duration-300 hover:scale-105 hover:bg-gray-100 hover:shadow-lg"
+                className={`group relative overflow-hidden rounded-full px-6 py-2 text-sm font-medium shadow-md transition-all duration-300 hover:scale-105 ${
+                  isAtBottom
+                    ? "from-based-orange animate-pulse bg-gradient-to-r to-orange-500 text-white shadow-orange-500/25 hover:shadow-orange-500/40"
+                    : "bg-white text-black hover:bg-gray-100 hover:shadow-lg"
+                }`}
               >
                 <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5">
                   Launch App
                 </span>
-                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover:translate-x-full"></div>
+                <div
+                  className={`absolute inset-0 transition-transform duration-500 ${
+                    isAtBottom
+                      ? "animate-pulse bg-gradient-to-r from-transparent via-orange-200/30 to-transparent"
+                      : "-translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full"
+                  }`}
+                ></div>
               </Button>
 
               <div className="md:hidden">
