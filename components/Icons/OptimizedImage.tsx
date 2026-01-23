@@ -115,6 +115,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       {!isLoaded && <div className={cn("absolute inset-0 animate-pulse", colorClasses[placeholderColor])} />}
 
       <img
+        // eslint-disable-next-line @next/next/no-img-element
         ref={imgRef}
         src={isInView || priority ? src : undefined}
         alt={alt}

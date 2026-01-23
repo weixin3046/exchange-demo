@@ -33,7 +33,12 @@
     "tailwindcss-animate": "^1.0.7",
     "viem": "^2.44.4",
     "wagmi": "^3.3.4",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@pear-protocol/hyperliquid-sdk": "^0.1.6",
+    "@rabby-wallet/hyperliquid-sdk": "^1.1.3",
+    "ethers": "^6.13.0",
+    "@hookform/resolvers": "^3.3.0",
+    "react-hook-form": "^7.51.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

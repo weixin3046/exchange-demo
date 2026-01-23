@@ -15,11 +15,6 @@ export default function HeroSection() {
     triggerOnce: true,
   });
 
-  const { ref: subtitleRef, isIntersecting: subtitleVisible } = useIntersectionObserver<HTMLParagraphElement>({
-    threshold: 0.3,
-    triggerOnce: true,
-  });
-
   const { ref: descriptionRef, isIntersecting: descriptionVisible } = useIntersectionObserver<HTMLParagraphElement>({
     threshold: 0.3,
     triggerOnce: true,
@@ -56,17 +51,11 @@ export default function HeroSection() {
             titleVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
           }`}
         >
-          <span className="block">Based</span>
+          <span className="block">Trade everything</span>
+          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-based-orange to-orange-400">
+            spend everywhere
+          </span>
         </h1>
-
-        <p
-          ref={subtitleRef}
-          className={`mx-auto mb-12 max-w-2xl text-xl leading-relaxed text-gray-300 transition-all delay-200 duration-1000 ease-out sm:text-2xl lg:text-3xl ${
-            subtitleVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-          }`}
-        >
-          Trade everything, spend everywhere
-        </p>
 
         <p
           ref={descriptionRef}

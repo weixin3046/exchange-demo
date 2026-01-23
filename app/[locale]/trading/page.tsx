@@ -1,202 +1,203 @@
 "use client";
 
-import { BarChart3, TrendingDown, TrendingUp } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import { useHyperliquidAuth } from "@/hooks/useHyperliquidAuth";
+import { useMarketData } from "@/hooks/useMarketData";
+import { usePositions } from "@/hooks/usePositions";
+import { useAuthStore } from "@/store/authStore";
+import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 
-interface TradeData {
-  symbol: string;
-  price: number;
-  change: number;
-  changePercent: number;
-  volume: string;
-}
+export default function TradingPage() {
+  const { mids, loading: marketLoading, getPrice } = useMarketData();
+  const { totalMarginUsed, accountValue, positions } = usePositions();
+  const { login, isAuthenticated, walletAddress } = useHyperliquidAuth();
+  const { isTestnet } = useAuthStore();
+  const [selectedCoin, setSelectedCoin] = useState("BTC");
 
-export default function TradingInterface() {
-  const [selectedPair, setSelectedPair] = useState("BTC/USDT");
-  const [orderType, setOrderType] = useState<"buy" | "sell">("buy");
-  const [amount, setAmount] = useState("");
-
-  // 模拟交易数据
-  const tradeData: TradeData[] = [
-    { symbol: "BTC/USDT", price: 43250.75, change: 1250.3, changePercent: 2.98, volume: "2.8B" },
-    { symbol: "ETH/USDT", price: 2650.45, change: -85.2, changePercent: -3.11, volume: "1.2B" },
-    { symbol: "BNB/USDT", price: 315.8, change: 12.45, changePercent: 4.1, volume: "450M" },
-    { symbol: "ADA/USDT", price: 0.485, change: -0.015, changePercent: -3.0, volume: "180M" },
-  ];
-
-  const currentPair = tradeData.find((pair) => pair.symbol === selectedPair) || tradeData[0];
-
-  const handleTrade = () => {
-    if (!amount) return;
-
-    // 模拟交易逻辑
-    alert(`${orderType.toUpperCase()} ${amount} ${selectedPair.split("/")[0]} at $${currentPair.price}`);
-    setAmount("");
-  };
+  const topCoins = Object.keys(mids)
+    .slice(0, 10)
+    .map((coin) => ({
+      coin,
+      price: mids[coin],
+    }));
 
   return (
-    <div className="min-h-screen bg-black p-6 text-white">
-      <div className="mx-auto max-w-7xl">
-        {/* 页面标题 */}
-        <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold">Trading Dashboard</h1>
-          <p className="text-gray-400">Real-time trading interface with live market data</p>
-        </div>
+    <div className="min-h-screen bg-black">
+      <Navbar />
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* 左侧 - 市场概览 */}
-          <div className="space-y-6 lg:col-span-2">
-            {/* 交易对选择器 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-              <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
-                <BarChart3 className="text-based-orange h-5 w-5" />
-                Market Overview
-              </h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {tradeData.map((pair) => (
-                  <button
-                    key={pair.symbol}
-                    onClick={() => setSelectedPair(pair.symbol)}
-                    className={`rounded-lg border p-4 transition-all ${
-                      selectedPair === pair.symbol
-                        ? "border-based-orange bg-based-orange/10"
-                        : "border-white/10 bg-white/5 hover:bg-white/10"
-                    }`}
-                  >
-                    <div className="text-sm font-medium">{pair.symbol}</div>
-                    <div className="text-lg font-bold">${pair.price.toLocaleString()}</div>
-                    <div
-                      className={`flex items-center gap-1 text-sm ${
-                        pair.change >= 0 ? "text-green-400" : "text-red-400"
-                      }`}
-                    >
-                      {pair.change >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                      {pair.change >= 0 ? "+" : ""}
-                      {pair.changePercent.toFixed(2)}%
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 价格图表占位符 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-              <h2 className="mb-4 text-xl font-semibold">{selectedPair} Price Chart</h2>
-              <div className="from-based-orange/20 flex h-64 items-center justify-center rounded-lg bg-gradient-to-r to-blue-500/20">
-                <div className="text-center">
-                  <BarChart3 className="mx-auto mb-2 h-12 w-12 text-gray-400" />
-                  <p className="text-gray-400">Chart visualization would go here</p>
-                  <p className="mt-1 text-sm text-gray-500">Integration with trading chart library needed</p>
-                </div>
-              </div>
-            </div>
+      <div className="px-4 pt-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="mb-2 text-4xl font-bold text-white">Trade</h1>
+            <p className="text-gray-400">
+              Perpetual and Spot Trading on Hyperliquid {isTestnet ? "(Testnet)" : "(Mainnet)"}
+            </p>
           </div>
 
-          {/* 右侧 - 交易面板 */}
-          <div className="space-y-6">
-            {/* 当前价格卡片 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-              <h2 className="mb-4 text-xl font-semibold">Current Price</h2>
-              <div className="text-center">
-                <div className="text-based-orange mb-2 text-3xl font-bold">${currentPair.price.toLocaleString()}</div>
-                <div
-                  className={`flex items-center justify-center gap-2 text-lg ${
-                    currentPair.change >= 0 ? "text-green-400" : "text-red-400"
-                  }`}
-                >
-                  {currentPair.change >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                  {currentPair.change >= 0 ? "+" : ""}${Math.abs(currentPair.change).toFixed(2)}(
-                  {currentPair.changePercent >= 0 ? "+" : ""}
-                  {currentPair.changePercent.toFixed(2)}%)
-                </div>
-                <div className="mt-2 text-sm text-gray-400">24h Volume: {currentPair.volume}</div>
-              </div>
-            </div>
-
-            {/* 交易表单 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-              <h2 className="mb-4 text-xl font-semibold">Place Order</h2>
-
-              {/* 订单类型选择 */}
-              <div className="mb-4 flex gap-2">
-                <button
-                  onClick={() => setOrderType("buy")}
-                  className={`flex-1 rounded-lg px-4 py-2 font-medium transition-all ${
-                    orderType === "buy" ? "bg-green-500 text-white" : "bg-white/10 text-gray-300 hover:bg-white/20"
-                  }`}
-                >
-                  Buy
-                </button>
-                <button
-                  onClick={() => setOrderType("sell")}
-                  className={`flex-1 rounded-lg px-4 py-2 font-medium transition-all ${
-                    orderType === "sell" ? "bg-red-500 text-white" : "bg-white/10 text-gray-300 hover:bg-white/20"
-                  }`}
-                >
-                  Sell
-                </button>
-              </div>
-
-              {/* 交易对显示 */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm font-medium text-gray-300">Trading Pair</label>
-                <div className="rounded-lg bg-white/10 px-3 py-2 font-medium text-white">{selectedPair}</div>
-              </div>
-
-              {/* 数量输入 */}
-              <div className="mb-6">
-                <label className="mb-2 block text-sm font-medium text-gray-300">Amount</label>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="focus:border-based-orange w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white placeholder-gray-400 focus:outline-none"
-                />
-                <div className="mt-1 text-xs text-gray-400">
-                  ≈ ${(parseFloat(amount) * currentPair.price || 0).toLocaleString()}
-                </div>
-              </div>
-
-              {/* 交易按钮 */}
+          {!isAuthenticated ? (
+            <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
+              <h2 className="mb-4 text-2xl font-bold text-white">Connect Your Wallet to Trade</h2>
               <button
-                onClick={handleTrade}
-                disabled={!amount}
-                className={`w-full rounded-lg px-4 py-3 font-medium transition-all ${
-                  orderType === "buy"
-                    ? "bg-green-500 hover:bg-green-600 disabled:bg-gray-600"
-                    : "bg-red-500 hover:bg-red-600 disabled:bg-gray-600"
-                } disabled:cursor-not-allowed`}
+                onClick={login}
+                className="from-based-orange hover:from-based-orange rounded-lg bg-gradient-to-r to-orange-600 px-8 py-3 font-semibold text-white transition-all duration-200 hover:to-orange-700"
               >
-                {orderType === "buy" ? "Buy" : "Sell"} {selectedPair.split("/")[0]}
+                Sign In
               </button>
             </div>
+          ) : (
+            <>
+              {/* Account Info */}
+              <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                  <p className="mb-2 text-sm text-gray-400">Account Value</p>
+                  <p className="text-2xl font-bold text-white">${parseFloat(accountValue).toFixed(2)}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                  <p className="mb-2 text-sm text-gray-400">Margin Used</p>
+                  <p className="text-2xl font-bold text-white">${parseFloat(totalMarginUsed).toFixed(2)}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                  <p className="mb-2 text-sm text-gray-400">Wallet</p>
+                  <p className="font-mono text-sm text-gray-300">{walletAddress?.slice(0, 10)}...</p>
+                </div>
+              </div>
 
-            {/* 账户余额（模拟） */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-6">
-              <h2 className="mb-4 text-xl font-semibold">Account Balance</h2>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-300">USDT</span>
-                  <span className="font-medium">10,000.00</span>
+              {/* Markets */}
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                {/* Market List */}
+                <div className="lg:col-span-1">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                    <h3 className="mb-4 text-lg font-semibold text-white">Top Markets</h3>
+                    {marketLoading ? (
+                      <p className="text-gray-400">Loading...</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {topCoins.map((item) => (
+                          <button
+                            key={item.coin}
+                            onClick={() => setSelectedCoin(item.coin)}
+                            className={`w-full rounded-lg px-4 py-2 text-left transition-all duration-200 ${
+                              selectedCoin === item.coin
+                                ? "bg-based-orange/20 border-based-orange/50 border"
+                                : "border border-transparent hover:bg-white/10"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-white">{item.coin}</span>
+                              <span className="text-sm text-gray-400">${parseFloat(item.price).toFixed(2)}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-300">BTC</span>
-                  <span className="font-medium">0.250000</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-300">ETH</span>
-                  <span className="font-medium">2.500000</span>
-                </div>
-                <div className="mt-3 border-t border-white/10 pt-3">
-                  <div className="flex justify-between font-semibold">
-                    <span>Total Value</span>
-                    <span className="text-based-orange">$25,625.00</span>
+
+                {/* Trading Panel */}
+                <div className="lg:col-span-2">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                    <h3 className="mb-6 text-lg font-semibold text-white">{selectedCoin} Trading</h3>
+
+                    {/* Tabs */}
+                    <div className="mb-6 flex gap-4 border-b border-white/10">
+                      <button className="border-based-orange border-b-2 px-4 py-2 font-semibold text-white">
+                        Limit
+                      </button>
+                      <button className="px-4 py-2 text-gray-400 transition-colors hover:text-white">Market</button>
+                    </div>
+
+                    {/* Buy/Sell Tabs */}
+                    <div className="mb-6 grid grid-cols-2 gap-4">
+                      <div className="cursor-pointer rounded-lg border border-green-500/30 bg-green-500/10 p-4 transition-all duration-200 hover:bg-green-500/20">
+                        <div className="mb-3 flex items-center gap-2">
+                          <ArrowUpRight className="h-5 w-5 text-green-400" />
+                          <span className="font-semibold text-white">Buy</span>
+                        </div>
+                        <p className="text-sm text-gray-400">Market price: ${getPrice(selectedCoin)}</p>
+                      </div>
+                      <div className="cursor-pointer rounded-lg border border-red-500/30 bg-red-500/10 p-4 transition-all duration-200 hover:bg-red-500/20">
+                        <div className="mb-3 flex items-center gap-2">
+                          <ArrowDownLeft className="h-5 w-5 text-red-400" />
+                          <span className="font-semibold text-white">Sell</span>
+                        </div>
+                        <p className="text-sm text-gray-400">Market price: ${getPrice(selectedCoin)}</p>
+                      </div>
+                    </div>
+
+                    {/* Order Form */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="mb-2 block text-sm text-gray-400">Size</label>
+                        <input
+                          type="number"
+                          placeholder="0.00"
+                          className="focus:border-based-orange w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-gray-500 transition-colors focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-sm text-gray-400">Price</label>
+                        <input
+                          type="number"
+                          placeholder={getPrice(selectedCoin) || "0"}
+                          className="focus:border-based-orange w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-gray-500 transition-colors focus:outline-none"
+                        />
+                      </div>
+                      <button className="from-based-orange hover:from-based-orange mt-6 w-full rounded-lg bg-gradient-to-r to-orange-600 px-6 py-3 font-semibold text-white transition-all duration-200 hover:to-orange-700">
+                        Place Order
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+
+              {/* Open Positions */}
+              {positions.length > 0 && (
+                <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6">
+                  <h3 className="mb-4 text-lg font-semibold text-white">Open Positions ({positions.length})</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="border-b border-white/10">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-400">Asset</th>
+                          <th className="px-4 py-3 text-right font-semibold text-gray-400">Size</th>
+                          <th className="px-4 py-3 text-right font-semibold text-gray-400">Entry Price</th>
+                          <th className="px-4 py-3 text-right font-semibold text-gray-400">PnL</th>
+                          <th className="px-4 py-3 text-right font-semibold text-gray-400">ROE</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {positions.map((pos) => (
+                          <tr key={pos.coin} className="border-b border-white/5 transition-colors hover:bg-white/5">
+                            <td className="px-4 py-4 font-semibold text-white">{pos.coin}</td>
+                            <td className="px-4 py-4 text-right text-gray-300">{parseFloat(pos.szi).toFixed(4)}</td>
+                            <td className="px-4 py-4 text-right text-gray-300">
+                              ${pos.entryPrice ? parseFloat(pos.entryPrice).toFixed(2) : "-"}
+                            </td>
+                            <td
+                              className={`px-4 py-4 text-right font-semibold ${
+                                parseFloat(pos.unrealizedPnl) >= 0 ? "text-green-400" : "text-red-400"
+                              }`}
+                            >
+                              ${parseFloat(pos.unrealizedPnl).toFixed(2)}
+                            </td>
+                            <td
+                              className={`px-4 py-4 text-right font-semibold ${
+                                parseFloat(pos.returnOnEquity) >= 0 ? "text-green-400" : "text-red-400"
+                              }`}
+                            >
+                              {(parseFloat(pos.returnOnEquity) * 100).toFixed(2)}%
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

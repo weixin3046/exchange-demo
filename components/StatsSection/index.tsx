@@ -1,7 +1,8 @@
 "use client";
 
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
-import { DollarSign, TrendingUp, Users, Zap } from "lucide-react";
+import { useCounterAnimation } from "@/hooks/useCounterAnimation";
+import { TrendingUp, Users, DollarSign, Zap } from "lucide-react";
 
 export default function StatsSection() {
   const { ref: sectionRef, isIntersecting: sectionVisible } = useIntersectionObserver({
@@ -9,36 +10,51 @@ export default function StatsSection() {
     triggerOnce: true,
   });
 
+  // 动画目标值（伪造数据）
+  const volumeTarget = 2800;
+  const usersTarget = 50000;
+  const totalTarget = 150;
+  
+  const volumeAnimated = useCounterAnimation(sectionVisible ? volumeTarget : 0, {
+    duration: 2000,
+  });
+  const usersAnimated = useCounterAnimation(sectionVisible ? usersTarget : 0, {
+    duration: 2000,
+  });
+  const totalAnimated = useCounterAnimation(sectionVisible ? totalTarget : 0, {
+    duration: 2000,
+  });
+
   const stats = [
     {
       icon: TrendingUp,
-      value: "$2.8B+",
-      label: "Volume Traded",
+      value: `$${volumeAnimated}M+`,
+      label: "Lifetime Trading Volume",
       description: "Across all markets",
       color: "text-green-400",
       delay: 0,
     },
     {
       icon: Users,
-      value: "50K+",
-      label: "Active Users",
-      description: "Trading daily",
+      value: `${usersAnimated}K+`,
+      label: "Based Users",
+      description: "Active traders",
       color: "text-blue-400",
       delay: 100,
     },
     {
       icon: DollarSign,
-      value: "$150M+",
-      label: "Total Volume",
-      description: "All time volume",
+      value: `$${totalAnimated}M+`,
+      label: "Affiliate Fees Distributed",
+      description: "Rewards to community",
       color: "text-purple-400",
       delay: 200,
     },
     {
       icon: Zap,
-      value: "0.01%",
-      label: "Fees",
-      description: "Trading fees",
+      value: "24/7",
+      label: "Market Hours",
+      description: "Non-stop trading",
       color: "text-based-orange",
       delay: 300,
     },
